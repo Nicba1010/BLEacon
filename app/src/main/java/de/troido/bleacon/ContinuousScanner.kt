@@ -6,15 +6,19 @@ import android.os.Handler
 
 private const val MAN_ID = 89
 
-private val MAN_UUID_MASK = byteArrayOf(0, 0, -1, -1, -1, -1)
+private val MAN_UUID_MASK = byteArrayOf(-1, 0, -1, -1, -1, -1)
 
 private val SCAN_SETTINGS =
         ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build()
 
-abstract class ContinuousScanner(uuid32: Uuid32) {
+/**
+ * @param uuid32 32 bit beacon UUID (unique per functionality)
+ * @param onFound (scanner, type, data) callback called when the device is found
+ */
+class ContinuousScanner(uuid32: Uuid32, onFound: (ContinuousScanner, Byte, ByteArray) -> Unit) {
     private val handler = Handler()
 
-    private val manUuid = byteArrayOf(0, 0) + uuid32.bytes
+    private val manUuid = byteArrayOf(2, 0) + uuid32.bytes
 
     private val filters = mutableListOf(
             ScanFilter.Builder().setManufacturerData(MAN_ID, manUuid, MAN_UUID_MASK).build()
@@ -39,8 +43,6 @@ abstract class ContinuousScanner(uuid32: Uuid32) {
         stop()
         handler.postDelayed(millis) { scanner.startScan(callback) }
     }
-
-    abstract fun onFound(scanner: ContinuousScanner, type: Byte, data: ByteArray): Unit
 }
 
 private fun obtainScanner(): BluetoothLeScanner {
