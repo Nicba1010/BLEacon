@@ -11,29 +11,20 @@ private val MAN_UUID_MASK = byteArrayOf(-1, 0, -1, -1, -1, -1)
 private val SCAN_SETTINGS =
         ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build()
 
-/**
- * @param uuid32 32 bit beacon UUID (unique per functionality)
- * @param onFound (scanner, type, data) callback called when the device is found
- */
-class ContinuousScanner(uuid32: Uuid32, onFound: (ContinuousScanner, Byte, ByteArray) -> Unit) {
+abstract class ContinuousScanner(val filters: List<ScanFilter>, manufacturerId: Int) {
     private val handler = Handler()
-
-    private val manUuid = byteArrayOf(2, 0) + uuid32.bytes
-
-    private val filters = mutableListOf(
-            ScanFilter.Builder().setManufacturerData(MAN_ID, manUuid, MAN_UUID_MASK).build()
-    )
-
     private val scanner = obtainScanner()
 
     private val callback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
-            result?.scanRecord?.getManufacturerSpecificData(MAN_ID)?.let {
-                onFound(this@ContinuousScanner, it[0], it.copyOfRange(1, it.size))
+            result?.scanRecord?.getManufacturerSpecificData(manufacturerId)?.let {
+                onDeviceFound(it.copyOf())
             }
         }
     }
+
+    abstract fun onDeviceFound(data: ByteArray)
 
     fun start() = handler.post { scanner.startScan(filters, SCAN_SETTINGS, callback) }
 
@@ -43,6 +34,25 @@ class ContinuousScanner(uuid32: Uuid32, onFound: (ContinuousScanner, Byte, ByteA
         stop()
         handler.postDelayed(millis) { scanner.startScan(callback) }
     }
+}
+
+class Uuid32ContinuousScanner(
+        uuid32: Uuid32,
+        private val onFound: (Uuid32ContinuousScanner, Byte, ByteArray) -> Unit
+) : ContinuousScanner(
+        listOf(
+                ScanFilter.Builder()
+                        .setManufacturerData(
+                                MAN_ID,
+                                byteArrayOf(2, 0) + uuid32.bytes,
+                                MAN_UUID_MASK
+                        )
+                        .build()
+        ),
+        MAN_ID
+) {
+    override fun onDeviceFound(data: ByteArray) =
+            onFound(this, data[0], data.copyOfRange(1, data.size))
 }
 
 private fun obtainScanner(): BluetoothLeScanner {

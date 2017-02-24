@@ -11,12 +11,10 @@ import android.os.SystemClock
 
 private const val RESTART_DELAY: Long = 100
 
-abstract class BleaconService(uuid32: Uuid32) : Service() {
+abstract class BleaconService(val scanner: ContinuousScanner) : Service() {
     class BleaconBinder(val service: BleaconService) : Binder()
 
     abstract fun onFound(scanner: ContinuousScanner, type: Byte, data: ByteArray): Unit
-
-    private val scanner = ContinuousScanner(uuid32) { s, t, d -> onFound(s, t, d) }
 
     override fun onBind(intent: Intent?): IBinder = BleaconBinder(this)
 

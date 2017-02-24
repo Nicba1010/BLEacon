@@ -12,8 +12,7 @@ class Uuid32 private constructor(uuid: String) {
         get() = safeBytes.copyOf()
 
     companion object {
-        fun fromString(s: String): Uuid32? =
-                if (s.all { it in HEX_CHARS }) Uuid32(s) else null
+        fun fromString(s: String): Uuid32 = Uuid32(s)
     }
 
     fun toUuid(): UUID = UUID.fromString(safeBytes.toHex() + BASE_UUID)
