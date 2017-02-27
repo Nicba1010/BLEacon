@@ -7,6 +7,7 @@ import java.util.*
 
 private const val MAN_ID = 89
 
+private val MAN_UUID16_MASK = byteArrayOf(0, 0, -1, -1)
 private val MAN_UUID32_MASK = byteArrayOf(0, 0, -1, -1, -1, -1)
 private val MAN_UUID_MASK = byteArrayOf(0, 0, -1, -1, -1, -1, -1, -1, -1, -1,
                                         -1, -1, -1, -1, -1, -1, -1, -1)
@@ -37,8 +38,6 @@ abstract class ContinuousScanner(private val filters: List<ScanFilter>) {
     }
 }
 
-fun UUID.toBytes(): ByteArray = hexStringToByteArray(toString().replace("-", ""))
-
 class UuidContinuousScanner(
         uuid: UUID,
         private val onFound: (UuidContinuousScanner, Map<Byte, ByteArray>) -> Unit
@@ -63,6 +62,13 @@ class Uuid32ContinuousScanner(
                                      )
                                      .build())) {
     override fun onDeviceFound(data: ByteArray) = onFound(this, mapOf()) //TODO parsing
+}
+
+class Uuid16ContinuousScanner(
+        uuid16: Uuid16,
+        private val onFound: (Uuid16ContinuousScanner, Map<Byte, ByteArray>) -> Unit
+) : ContinuousScanner(listOf()) {
+    override fun onDeviceFound(data: ByteArray) = onFound(this, mapOf())
 }
 
 private fun obtainScanner(): BluetoothLeScanner {
