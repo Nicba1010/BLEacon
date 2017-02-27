@@ -40,15 +40,13 @@ class Uuid32ContinuousScanner(
         uuid32: Uuid32,
         private val onFound: (Uuid32ContinuousScanner, Byte, ByteArray) -> Unit
 ) : ContinuousScanner(
-        listOf(
-                ScanFilter.Builder()
-                        .setManufacturerData(
-                                MAN_ID,
-                                byteArrayOf(2, 0) + uuid32.bytes,
-                                MAN_UUID_MASK
-                        )
-                        .build()
-        ),
+        listOf(ScanFilter.Builder()
+                       .setManufacturerData(
+                               MAN_ID,
+                               byteArrayOf(2, 0) + uuid32.bytes,
+                               MAN_UUID_MASK
+                       )
+                       .build()),
         MAN_ID
 ) {
     override fun onDeviceFound(data: ByteArray) =
