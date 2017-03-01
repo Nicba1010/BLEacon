@@ -1,4 +1,4 @@
-package de.troido.bleacon
+package de.troido.bleacon.service
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -8,18 +8,19 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.os.SystemClock
+import de.troido.bleacon.scanner.BleaconScanner
 
 private const val RESTART_DELAY: Long = 100
 
-abstract class BleaconService(val scanner: ContinuousScanner) : Service() {
+abstract class BleaconService : Service() {
     class BleaconBinder(val service: BleaconService) : Binder()
 
-    abstract fun onFound(scanner: ContinuousScanner, type: Byte, data: ByteArray): Unit
+    protected abstract val scanner: BleaconScanner
 
     override fun onBind(intent: Intent?): IBinder = BleaconBinder(this)
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int =
-            Service.START_STICKY
+            START_STICKY
 
     override fun onCreate() {
         super.onCreate()
@@ -28,6 +29,7 @@ abstract class BleaconService(val scanner: ContinuousScanner) : Service() {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
+        scanner.stop()
         (applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager).set(
                 AlarmManager.ELAPSED_REALTIME,
                 SystemClock.elapsedRealtime() + RESTART_DELAY,

@@ -1,4 +1,4 @@
-package de.troido.bleacon
+package de.troido.bleacon.service
 
 import android.content.BroadcastReceiver
 import android.content.Context

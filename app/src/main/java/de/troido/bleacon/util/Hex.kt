@@ -1,8 +1,8 @@
-package de.troido.bleacon
+package de.troido.bleacon.util
 
 private const val HEX_CHARS = "0123456789abcdef"
 
-fun hexStringToByteArray(s: String): ByteArray = s.toLowerCase().let {
+internal fun hexStringToByteArray(s: String): ByteArray = s.toLowerCase().let {
     val result = ByteArray(it.length / 2)
     for (i in 0 until it.length step 2) {
         result[i.shr(1)] = HEX_CHARS.indexOf(it[i]).shl(4).or(HEX_CHARS.indexOf(it[i + 1])).toByte()
@@ -10,7 +10,7 @@ fun hexStringToByteArray(s: String): ByteArray = s.toLowerCase().let {
     return result
 }
 
-fun ByteArray.toHex(): String {
+internal fun ByteArray.toHex(): String {
     val result = StringBuffer()
     forEach {
         val octet = it.toInt()
@@ -20,3 +20,4 @@ fun ByteArray.toHex(): String {
     return result.toString()
 }
 
+internal fun Byte.toUInt(): Int = toInt() and 0xff
