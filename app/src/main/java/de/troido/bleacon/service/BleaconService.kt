@@ -41,4 +41,9 @@ abstract class BleaconService : Service() {
                 )
         )
     }
+
+    override fun onDestroy() {
+        scanner.stop()
+        super.onDestroy()
+    }
 }
