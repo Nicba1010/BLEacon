@@ -25,7 +25,7 @@ class Uuid16BleaconScanner(
                         data += BleaconData.AnalogInput(payload[i + 1])
                         i += 2
                     }
-                    else                       -> data.toList()
+                    else                       -> return data.toList()
                 }
             }
         } catch (ignored: ArrayIndexOutOfBoundsException) {}
