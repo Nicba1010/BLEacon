@@ -1,12 +1,13 @@
 package de.troido.bleacon.scanner
 
+import android.bluetooth.BluetoothDevice
 import de.troido.bleacon.BleaconData
 import de.troido.bleacon.util.filterByManufacturerData
 import de.troido.bleacon.util.toUInt
 
 class Uuid16BleaconScanner(
         uuid16: Uuid16,
-        onDeviceFound: (BleaconScanner, List<BleaconData>) -> Unit
+        onDeviceFound: (BleaconScanner, BluetoothDevice, List<BleaconData>) -> Unit
 ) : BleaconScanner(
         toManufacturerId(uuid16.bytes),
         listOf(filterByManufacturerData(toManufacturerId(uuid16.bytes))),
