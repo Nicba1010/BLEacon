@@ -10,13 +10,10 @@ import de.troido.bleacon.util.postDelayed
 private val SCAN_SETTINGS =
         ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build()
 
-private val NOOP: (BleaconScanner, BluetoothDevice, List<BleaconData>) -> Unit = { s, b, d -> }
-
 abstract class BleaconScanner(
         protected val manufacturerId: Int,
         private val filters: List<ScanFilter>,
         private val onDeviceFound: (BleaconScanner, BluetoothDevice, List<BleaconData>) -> Unit
-        = NOOP
 ) {
     private val handler = Handler()
     private val scanner = obtainScanner()
