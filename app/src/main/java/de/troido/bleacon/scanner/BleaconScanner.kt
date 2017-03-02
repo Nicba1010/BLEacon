@@ -22,7 +22,7 @@ abstract class BleaconScanner(
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
             result?.run {
-                scanRecord.manufacturerSpecificData[manufacturerId]?.let {
+                scanRecord?.getManufacturerSpecificData(manufacturerId)?.let {
                     onDeviceFound(this@BleaconScanner, device, deserialize(it))
                 }
             }
