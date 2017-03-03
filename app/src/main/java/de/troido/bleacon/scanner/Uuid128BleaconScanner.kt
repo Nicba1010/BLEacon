@@ -6,14 +6,13 @@ import de.troido.bleacon.util.filterByManufacturerData
 import de.troido.bleacon.util.toBytes
 import java.util.*
 
-private const val ID = 0
+private val MASK = byteArrayOf(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1)
 
 class Uuid128BleaconScanner(
         uuid: UUID,
         onDeviceFound: (BleaconScanner, BluetoothDevice, List<BleaconData>) -> Unit
 ) : BleaconScanner(
-        ID,
-        listOf(filterByManufacturerData(ID, uuid.toBytes())),
+        listOf(filterByManufacturerData(NORDIC_ID, uuid.toBytes(), MASK)),
         onDeviceFound
 ) {
     override fun deserialize(payload: ByteArray): List<BleaconData> =

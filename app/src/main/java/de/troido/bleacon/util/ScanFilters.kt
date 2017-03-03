@@ -4,7 +4,9 @@ import android.bluetooth.le.ScanFilter
 
 private val EMPTY = byteArrayOf()
 
-internal fun filterByManufacturerData(id: Int, data: ByteArray = EMPTY): ScanFilter =
+internal fun filterByManufacturerData(id: Int,
+                                      data: ByteArray = EMPTY,
+                                      mask: ByteArray? = null): ScanFilter =
         ScanFilter.Builder()
-                .setManufacturerData(id, data)
+                .setManufacturerData(id, data, mask)
                 .build()

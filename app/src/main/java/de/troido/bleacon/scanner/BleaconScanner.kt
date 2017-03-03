@@ -11,7 +11,6 @@ private val SCAN_SETTINGS =
         ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build()
 
 abstract class BleaconScanner(
-        protected val manufacturerId: Int,
         private val filters: List<ScanFilter>,
         private val onDeviceFound: (BleaconScanner, BluetoothDevice, List<BleaconData>) -> Unit
 ) {
@@ -22,7 +21,7 @@ abstract class BleaconScanner(
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
             result?.run {
-                scanRecord?.getManufacturerSpecificData(manufacturerId)?.let {
+                scanRecord?.getManufacturerSpecificData(NORDIC_ID)?.let {
                     onDeviceFound(this@BleaconScanner, device, deserialize(it))
                 }
             }
