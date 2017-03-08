@@ -12,10 +12,10 @@ import de.troido.bleacon.scanner.BleaconScanner
 
 private const val RESTART_DELAY: Long = 100
 
-abstract class BleaconService : Service() {
-    class BleaconBinder(val service: BleaconService) : Binder()
+abstract class BleaconService<out T> : Service() {
+    class BleaconBinder<out T>(val service: BleaconService<T>) : Binder()
 
-    protected abstract val scanner: BleaconScanner
+    protected abstract val scanner: BleaconScanner<T>
 
     override fun onBind(intent: Intent?): IBinder = BleaconBinder(this)
 

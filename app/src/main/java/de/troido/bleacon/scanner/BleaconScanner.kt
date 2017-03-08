@@ -2,17 +2,23 @@ package de.troido.bleacon.scanner
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.le.*
+import android.bluetooth.le.BluetoothLeScanner
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.os.Handler
-import de.troido.bleacon.BleaconData
+import de.troido.bleacon.data.BleDeserializer
+import de.troido.bleacon.util.BleFilter
+import de.troido.bleacon.util.mfilter
 import de.troido.bleacon.util.postDelayed
 
 private val SCAN_SETTINGS =
-        ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build()
+        ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
 
-abstract class BleaconScanner(
-        private val filters: List<ScanFilter>,
-        private val onDeviceFound: (BleaconScanner, BluetoothDevice, List<BleaconData>) -> Unit
+class BleaconScanner<out T>(
+        private val filter: BleFilter,
+        private val deserializer: BleDeserializer<T>,
+        private val onDeviceFound: (BleaconScanner<T>, BluetoothDevice, T) -> Unit
 ) {
     private val handler = Handler()
     private val scanner = obtainScanner()
@@ -21,16 +27,19 @@ abstract class BleaconScanner(
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
             result?.run {
-                scanRecord?.getManufacturerSpecificData(NORDIC_ID)?.let {
-                    onDeviceFound(this@BleaconScanner, device, deserialize(it))
-                }
+                scanRecord
+                        ?.getManufacturerSpecificData(NORDIC_ID)
+                        ?.let(filter.dataTransform)
+                        ?.mfilter { it.size >= deserializer.length }
+                        ?.let(deserializer::deserialize)
+                        ?.let { onDeviceFound(this@BleaconScanner, device, it) }
             }
         }
     }
 
-    abstract protected fun deserialize(payload: ByteArray): List<BleaconData>
-
-    fun start() = handler.post { scanner.startScan(filters, SCAN_SETTINGS, callback) }
+    fun start() = handler.post {
+        scanner.startScan(listOf(filter.filter), SCAN_SETTINGS, callback)
+    }
 
     fun stop() = handler.post { scanner.stopScan(callback) }
 
