@@ -12,16 +12,15 @@ import de.troido.bleacon.util.BleFilter
 import de.troido.bleacon.util.mfilter
 import de.troido.bleacon.util.postDelayed
 
-private val SCAN_SETTINGS =
-        ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build()
-
 class BleaconScanner<out T>(
         private val filter: BleFilter,
         private val deserializer: BleDeserializer<T>,
+        scanMode: Int = ScanSettings.SCAN_MODE_LOW_POWER,
         private val onDeviceFound: (BleaconScanner<T>, BluetoothDevice, T) -> Unit
 ) {
     private val handler = Handler()
     private val scanner = obtainScanner()
+    private val scanSettings = ScanSettings.Builder().setScanMode(scanMode).build()
 
     private val callback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
