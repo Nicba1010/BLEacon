@@ -24,7 +24,8 @@ internal inline fun <A, B> Array<A>.foldM(initial: B, f: (B, A) -> B?): B? {
  *          ?.let {...}
  * ```
  */
-internal inline fun <T> T.mfilter(p: (T) -> Boolean): T? = if (p(this)) this else null
+internal inline fun <T> T?.mfilter(p: (T) -> Boolean): T? =
+        if (this != null && p(this)) this else null
 
 /**
  * Given a `List<T?>` returns a `List<T>` if no elements are `null`, otherwise returns `null`.

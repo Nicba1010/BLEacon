@@ -1,6 +1,4 @@
-package de.troido.bleacon.scanner
-
-import de.troido.bleacon.util.toUInt
+package de.troido.bleacon.util
 
 internal val NORDIC_ID = toManufacturerId(byteArrayOf(0x59, 0x00))
 

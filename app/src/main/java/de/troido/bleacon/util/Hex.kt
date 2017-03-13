@@ -20,4 +20,4 @@ internal fun ByteArray.toHex(): String {
     return result.toString()
 }
 
-internal fun Byte.toUInt(): Int = toInt() and 0xff
+internal inline fun Byte.toUInt(): Int = toInt() and 0xff

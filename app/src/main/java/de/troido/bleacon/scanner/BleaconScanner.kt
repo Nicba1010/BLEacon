@@ -7,17 +7,18 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.os.Handler
+import de.troido.bleacon.ble.BleActor
 import de.troido.bleacon.data.BleDeserializer
 import de.troido.bleacon.util.BleFilter
+import de.troido.bleacon.util.NORDIC_ID
 import de.troido.bleacon.util.mfilter
-import de.troido.bleacon.util.postDelayed
 
 class BleaconScanner<out T>(
         private val filter: BleFilter,
         private val deserializer: BleDeserializer<T>,
         scanMode: Int = ScanSettings.SCAN_MODE_LOW_POWER,
         private val onDeviceFound: (BleaconScanner<T>, BluetoothDevice, T) -> Unit
-) {
+) : BleActor() {
     private val handler = Handler()
     private val scanner = obtainScanner()
     private val scanSettings = ScanSettings.Builder().setScanMode(scanMode).build()
@@ -29,22 +30,21 @@ class BleaconScanner<out T>(
                 scanRecord
                         ?.getManufacturerSpecificData(NORDIC_ID)
                         ?.let(filter.dataTransform)
-                        ?.mfilter { it.size >= deserializer.length }
+                        .mfilter { it.size >= deserializer.length }
                         ?.let(deserializer::deserialize)
                         ?.let { onDeviceFound(this@BleaconScanner, device, it) }
             }
         }
     }
 
-    fun start() = handler.post {
-        scanner.startScan(listOf(filter.filter), scanSettings, callback)
+    override fun start() {
+        handler.post {
+            scanner.startScan(listOf(filter.filter), scanSettings, callback)
+        }
     }
 
-    fun stop() = handler.post { scanner.stopScan(callback) }
-
-    fun pause(millis: Long) {
-        stop()
-        handler.postDelayed(millis) { scanner.startScan(callback) }
+    override fun stop() {
+        handler.post { scanner.stopScan(callback) }
     }
 }
 
