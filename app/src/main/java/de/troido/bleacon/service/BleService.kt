@@ -16,11 +16,17 @@ abstract class BleService<out T>(
         private val autoStart: Boolean = true,
         private val restartOnRemove: Boolean = true
 ) : Service() {
-    class BleBinder<out T>(val service: BleService<T>) : Binder()
+
+    inner class BleBinder() : Binder(), BleActor {
+        override fun start() = actors.forEach(BleActor::start)
+        override fun stop() = actors.forEach(BleActor::stop)
+        override fun start(millis: Long) = actors.forEach { it.start(millis) }
+        override fun pause(millis: Long) = actors.forEach { it.pause(millis) }
+    }
 
     protected abstract val actors: List<BleActor>
 
-    override fun onBind(intent: Intent?): IBinder = BleBinder(this)
+    override fun onBind(intent: Intent?): IBinder = BleBinder()
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int =
             START_STICKY

@@ -7,7 +7,7 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.os.Handler
-import de.troido.bleacon.ble.BleActor
+import de.troido.bleacon.ble.HandledBleActor
 import de.troido.bleacon.data.BleDeserializer
 import de.troido.bleacon.util.BleFilter
 import de.troido.bleacon.util.NORDIC_ID
@@ -16,12 +16,15 @@ import de.troido.bleacon.util.mfilter
 class BleaconScanner<out T>(
         private val filter: BleFilter,
         private val deserializer: BleDeserializer<T>,
-        scanMode: Int = ScanSettings.SCAN_MODE_LOW_POWER,
+        scanMode: Int? = null,
+        handler: Handler = Handler(),
         private val onDeviceFound: (BleaconScanner<T>, BluetoothDevice, T) -> Unit
-) : BleActor() {
-    private val handler = Handler()
+) : HandledBleActor(handler) {
+
     private val scanner = obtainScanner()
-    private val scanSettings = ScanSettings.Builder().setScanMode(scanMode).build()
+    private val scanSettings = ScanSettings.Builder()
+            .apply { scanMode?.let(this::setScanMode) }
+            .build()
 
     private val callback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult?) {

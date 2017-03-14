@@ -17,7 +17,8 @@ private val UUID128_TRANSFORM: (ByteArray) -> ByteArray =
 fun bleFilter(build: BleFilter.Builder.() -> Unit): BleFilter =
         BleFilter.Builder().apply(build).let { BleFilter(it.filter.build(), it.dataTransform) }
 
-class BleFilter(val filter: ScanFilter, val dataTransform: (ByteArray) -> ByteArray) {
+class BleFilter(internal val filter: ScanFilter,
+                internal val dataTransform: (ByteArray) -> ByteArray) {
     class Builder {
         internal val filter = ScanFilter.Builder()
         val manufacturerData = ManufacturerDataBuilder(filter)

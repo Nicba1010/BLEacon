@@ -6,7 +6,7 @@ import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.bluetooth.le.BluetoothLeAdvertiser
 import android.os.Handler
-import de.troido.bleacon.ble.BleActor
+import de.troido.bleacon.ble.HandledBleActor
 import de.troido.bleacon.scanner.Uuid16
 import de.troido.bleacon.util.NORDIC_ID
 import de.troido.bleacon.util.bytes
@@ -18,9 +18,10 @@ class BleAdvertiser(
         uuid16: Uuid16? = null,
         uuid128: UUID? = null,
         advertiseMode: Int? = null,
-        txPowerLevel: Int? = null
-) : BleActor() {
-    private val handler = Handler()
+        txPowerLevel: Int? = null,
+        handler: Handler = Handler()
+) : HandledBleActor(handler) {
+
     private val advertiser = obtainAdvertiser()
 
     private val data = AdvertiseData.Builder()
