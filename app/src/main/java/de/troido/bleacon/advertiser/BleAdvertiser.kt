@@ -12,7 +12,7 @@ import de.troido.bleacon.util.NORDIC_ID
 import de.troido.bleacon.util.bytes
 import java.util.*
 
-private val header = byteArrayOf(-1, -1)
+private val header = byteArrayOf(-1)
 
 class BleAdvertiser(
         uuid16: Uuid16? = null,
