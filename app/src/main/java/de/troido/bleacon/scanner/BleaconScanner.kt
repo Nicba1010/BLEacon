@@ -11,7 +11,6 @@ import de.troido.bleacon.ble.HandledBleActor
 import de.troido.bleacon.data.BleDeserializer
 import de.troido.bleacon.util.BleFilter
 import de.troido.bleacon.util.NORDIC_ID
-import de.troido.bleacon.util.mfilter
 
 class BleaconScanner<out T>(
         private val filter: BleFilter,
@@ -33,7 +32,7 @@ class BleaconScanner<out T>(
                 scanRecord
                         ?.getManufacturerSpecificData(NORDIC_ID)
                         ?.let(filter.dataTransform)
-                        .mfilter { it.size >= deserializer.length }
+                        ?.takeIf { it.size >= deserializer.length }
                         ?.let(deserializer::deserialize)
                         ?.let { onDeviceFound(this@BleaconScanner, device, it) }
             }

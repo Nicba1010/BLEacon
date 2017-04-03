@@ -14,20 +14,6 @@ internal inline fun <A, B> Array<A>.foldM(initial: B, f: (B, A) -> B?): B? {
 }
 
 /**
- * Returns `this` if `this` satisfies the given predicate, otherwise returns `null`.
- * Useful for `let`-chaining, where it can ensure the chain is broken if a predicate
- * is not satisfied without awkward interruptions and large lambdas:
- * ```
- * something.let {...}
- *          .let {...}
- *          .mfilter {...}
- *          ?.let {...}
- * ```
- */
-internal inline fun <T> T?.mfilter(p: (T) -> Boolean): T? =
-        if (this != null && p(this)) this else null
-
-/**
  * Given a `List<T?>` returns a `List<T>` if no elements are `null`, otherwise returns `null`.
  */
 @Suppress("UNCHECKED_CAST")
