@@ -1,12 +1,14 @@
-package de.troido.bleacon.advertiser
+package de.troido.bleacon.reverse
 
 import android.bluetooth.BluetoothDevice
 import android.os.Handler
+import de.troido.bleacon.advertiser.BleAdvertiser
 import de.troido.bleacon.ble.HandledBleActor
+import de.troido.bleacon.ble.Uuid16
+import de.troido.bleacon.config.BleAdData
+import de.troido.bleacon.config.BleFilter
 import de.troido.bleacon.data.BleDeserializer
 import de.troido.bleacon.scanner.BleaconScanner
-import de.troido.bleacon.scanner.Uuid16
-import de.troido.bleacon.util.bleFilter
 import java.util.*
 
 class ReverseBleacon<out T>(
@@ -21,9 +23,9 @@ class ReverseBleacon<out T>(
 ) : HandledBleActor(handler) {
 
     private val scanner = BleaconScanner(
-            bleFilter {
-                this@ReverseBleacon.uuid16?.let { uuid16 = it }
-                this@ReverseBleacon.uuid128.let { uuid128 = it }
+            BleFilter {
+                uuid16 = this@ReverseBleacon.uuid16
+                uuid128 = this@ReverseBleacon.uuid128
             },
             deserializer,
             scanMode,
@@ -31,7 +33,15 @@ class ReverseBleacon<out T>(
             onDeviceFound = onDeviceFound
     )
 
-    private val advertiser = BleAdvertiser(uuid16, uuid128, advertiseMode, txPowerLevel, handler)
+    private val advertiser = BleAdvertiser(
+            BleAdData {
+                uuid16 = this@ReverseBleacon.uuid16
+                uuid128 = this@ReverseBleacon.uuid128
+            },
+            advertiseMode,
+            txPowerLevel,
+            handler
+    )
 
     override fun start() {
         handler.post {

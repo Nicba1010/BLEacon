@@ -1,16 +1,25 @@
 package de.troido.bleacon.scanner
 
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.os.Handler
 import de.troido.bleacon.ble.HandledBleActor
+import de.troido.bleacon.ble.obtainScanner
+import de.troido.bleacon.config.BleFilter
 import de.troido.bleacon.data.BleDeserializer
-import de.troido.bleacon.util.BleFilter
 import de.troido.bleacon.util.NORDIC_ID
+
+private val EMPTY = byteArrayOf()
+private val UUID16_MASK = byteArrayOf(-1, -1)
+private val UUID128_MASK = byteArrayOf(-1, -1, -1, -1, -1, -1, -1, -1,
+                                       -1, -1, -1, -1, -1, -1, -1, -1)
+
+private val UUID16_TRANSFORM: (ByteArray) -> ByteArray =
+        { it.copyOfRange(UUID16_MASK.size, it.size) }
+private val UUID128_TRANSFORM: (ByteArray) -> ByteArray =
+        { it.copyOfRange(UUID128_MASK.size, it.size) }
 
 class BleaconScanner<out T>(
         private val filter: BleFilter,
@@ -47,16 +56,5 @@ class BleaconScanner<out T>(
 
     override fun stop() {
         handler.post { scanner.stopScan(callback) }
-    }
-}
-
-private fun obtainScanner(): BluetoothLeScanner {
-    val adapter = BluetoothAdapter.getDefaultAdapter()
-    if (!adapter.isEnabled) {
-        adapter.enable()
-    }
-    while (true) {
-        adapter.bluetoothLeScanner?.let { return it }
-        Thread.sleep(50)
     }
 }

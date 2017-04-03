@@ -1,4 +1,4 @@
-package de.troido.bleacon.scanner
+package de.troido.bleacon.ble
 
 import de.troido.bleacon.util.hexStringToByteArray
 import de.troido.bleacon.util.toHex

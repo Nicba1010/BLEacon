@@ -1,7 +1,9 @@
-package de.troido.bleacon.util
+package de.troido.bleacon.config
 
 import android.bluetooth.le.ScanFilter
-import de.troido.bleacon.scanner.Uuid16
+import de.troido.bleacon.ble.Uuid16
+import de.troido.bleacon.util.NORDIC_ID
+import de.troido.bleacon.util.bytes
 import java.util.*
 
 private val EMPTY = byteArrayOf()
@@ -14,11 +16,13 @@ private val UUID16_TRANSFORM: (ByteArray) -> ByteArray =
 private val UUID128_TRANSFORM: (ByteArray) -> ByteArray =
         { it.copyOfRange(UUID128_MASK.size, it.size) }
 
-fun bleFilter(build: BleFilter.Builder.() -> Unit): BleFilter =
-        BleFilter.Builder().apply(build).let { BleFilter(it.filter.build(), it.dataTransform) }
-
 class BleFilter(internal val filter: ScanFilter,
                 internal val dataTransform: (ByteArray) -> ByteArray) {
+
+    constructor(builder: Builder) : this(builder.filter.build(), builder.dataTransform)
+
+    constructor(build: Builder.() -> Unit) : this(BleFilter.Builder().apply(build))
+
     class Builder {
         internal val filter = ScanFilter.Builder()
         val manufacturerData = ManufacturerDataBuilder(filter)
@@ -30,13 +34,13 @@ class BleFilter(internal val filter: ScanFilter,
 
         var uuid16: Uuid16? = null
             set(value) {
-                value?.let { filter.setManufacturerData(NORDIC_ID, it.bytes, UUID16_MASK) }
+                value?.let { manufacturerData[NORDIC_ID, UUID16_MASK] = it.bytes }
                 dataTransform = UUID16_TRANSFORM
             }
 
         var uuid128: UUID? = null
             set(value) {
-                value?.let { filter.setManufacturerData(NORDIC_ID, it.bytes, UUID128_MASK) }
+                value?.let { manufacturerData[NORDIC_ID, UUID128_MASK] = it.bytes }
                 dataTransform = UUID128_TRANSFORM
             }
 
