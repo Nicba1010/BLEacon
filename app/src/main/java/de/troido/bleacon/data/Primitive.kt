@@ -3,6 +3,10 @@ package de.troido.bleacon.data
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
+/**
+ * Wrappers and deserializers for some primitive data types.
+ * All deserializers assume [ByteOrder.LITTLE_ENDIAN] endianness.
+ */
 sealed class Primitive {
     object Unit : Primitive() {
         object Deserializer : BleDeserializer<Unit> {
@@ -13,6 +17,11 @@ sealed class Primitive {
     }
 
     data class Float32(val data: Float) : Primitive() {
+
+        /**
+         * [Float32] deserializer.
+         * Assumes [ByteOrder.LITTLE_ENDIAN] endianness.
+         */
         object Deserializer : BleDeserializer<Float32> {
             override val length = 4
 
@@ -22,6 +31,11 @@ sealed class Primitive {
     }
 
     data class Float64(val data: Double) : Primitive() {
+
+        /**
+         * [Float64] deserializer.
+         * Assumes [ByteOrder.LITTLE_ENDIAN] endianness.
+         */
         object Deserializer : BleDeserializer<Float64> {
             override val length = 8
 
@@ -31,6 +45,11 @@ sealed class Primitive {
     }
 
     data class Int8(val data: Byte) : Primitive() {
+
+        /**
+         * [Int8] deserializer.
+         * Assumes [ByteOrder.LITTLE_ENDIAN] endianness.
+         */
         object Deserializer : BleDeserializer<Int8> {
             override val length = 1
 
@@ -39,6 +58,11 @@ sealed class Primitive {
     }
 
     data class Int16(val data: Short) : Primitive() {
+
+        /**
+         * [Int16] deserializer.
+         * Assumes [ByteOrder.LITTLE_ENDIAN] endianness.
+         */
         object Deserializer : BleDeserializer<Int16> {
             override val length = 2
 
@@ -48,6 +72,11 @@ sealed class Primitive {
     }
 
     data class Int32(val data: Int) : Primitive() {
+
+        /**
+         * [Int32] deserializer.
+         * Assumes [ByteOrder.LITTLE_ENDIAN] endianness.
+         */
         object Deserializer : BleDeserializer<Int32> {
             override val length = 4
 
@@ -57,6 +86,11 @@ sealed class Primitive {
     }
 
     data class Int64(val data: Long) : Primitive() {
+
+        /**
+         * [Int64] deserializer.
+         * Assumes [ByteOrder.LITTLE_ENDIAN] endianness.
+         */
         object Deserializer : BleDeserializer<Int64> {
             override val length = 8
 

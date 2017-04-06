@@ -2,10 +2,18 @@ package de.troido.bleacon.util
 
 import android.util.Log
 
-internal inline fun <T : Any> T.log(msg: Any?) {
+/** Debug logging function. */
+internal typealias DLogger = (Any?) -> Unit
+
+/**
+ * Logs the given message to debug output with `this` class's simple name ([Class.getSimpleName])
+ * name as a tag.
+ */
+internal inline fun <T : Any> T.dLog(msg: Any?) {
     Log.d(this::class.java.simpleName, msg.toString())
 }
 
-internal inline fun logger(tag: String): (Any?) -> Unit = {
+/** Returns a debug logging function with the given tag. */
+internal inline fun dLogger(tag: String): DLogger = {
     Log.d(tag, it.toString())
 }

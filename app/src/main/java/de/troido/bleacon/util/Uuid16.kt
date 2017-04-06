@@ -1,7 +1,5 @@
-package de.troido.bleacon.ble
+package de.troido.bleacon.util
 
-import de.troido.bleacon.util.hexStringToByteArray
-import de.troido.bleacon.util.toHex
 import java.util.*
 
 private const val BASE_UUID = "0000-0000-1000-8000-00805F9B34FB"

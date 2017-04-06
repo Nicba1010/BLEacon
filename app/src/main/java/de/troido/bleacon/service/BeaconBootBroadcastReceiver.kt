@@ -5,7 +5,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 
-abstract class BootBroadcastReceiver<S : Service> : BroadcastReceiver() {
+/**
+ * [BroadcastReceiver] which starts the specified [service] on boot (assuming it's correctly
+ * registered in the manifest).
+ */
+abstract class ServiceBootBroadcastReceiver<S : Service> : BroadcastReceiver() {
     abstract val service: Class<S>
 
     override fun onReceive(context: Context?, intent: Intent?) {

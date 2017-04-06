@@ -12,11 +12,21 @@ import de.troido.bleacon.util.alarmService
 
 private const val RESTART_DELAY: Long = 100
 
+/**
+ * Service for background BLE actions.
+ *
+ * @param[autoStart] if `true` automatically starts BLE actors on service start
+ * @param[restartOnRemove] if `true` automatically restarts the activity on task removal
+ */
 abstract class BleService<out T>(
         private val autoStart: Boolean = true,
         private val restartOnRemove: Boolean = true
 ) : Service() {
 
+    /**
+     * Service binder for [BleService].
+     * Its [BleActor] methods directly control all of the [actors] at once.
+     */
     inner class BleBinder() : Binder(), BleActor {
         override fun start() = actors.forEach(BleActor::start)
         override fun stop() = actors.forEach(BleActor::stop)
@@ -24,6 +34,10 @@ abstract class BleService<out T>(
         override fun pause(millis: Long) = actors.forEach { it.pause(millis) }
     }
 
+    /**
+     * BLE actors controlled by the [BleBinder]'s [BleActor] methods, and the service, if
+     * [autoStart] is `true`.
+     */
     protected abstract val actors: List<BleActor>
 
     override fun onBind(intent: Intent?): IBinder = BleBinder()

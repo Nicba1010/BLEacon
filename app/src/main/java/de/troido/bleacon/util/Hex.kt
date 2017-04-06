@@ -20,4 +20,8 @@ internal fun ByteArray.toHex(): String {
     return result.toString()
 }
 
+/** Returns `this` as an unsigned integer. */
 internal inline fun Byte.toUInt(): Int = toInt() and 0xff
+
+/** Returns `this` as an unsigned integer. */
+internal inline fun Short.toUInt(): Int = toInt() and 0xffff
