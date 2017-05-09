@@ -17,9 +17,9 @@ typealias OnBeaconFound<T> = (BeaconScanner<T>, BluetoothDevice, T) -> Unit
  * @param[handler] optional handler for sharing with other asynchronous actions.
  */
 class BeaconScanner<out T>(
-        filter: BleFilter,
-        settings: BleScanSettings,
         private val deserializer: BleDeserializer<T>,
+        filter: BleFilter,
+        settings: BleScanSettings = BleScanSettings {},
         handler: Handler = Handler(),
         private val onDeviceFound: OnBeaconFound<T>
 ) : HandledBleActor(handler) {

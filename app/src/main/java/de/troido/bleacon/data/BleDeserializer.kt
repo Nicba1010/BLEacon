@@ -41,3 +41,20 @@ fun <A, B> BleDeserializer<A>.recoverableMapping(f: (A?) -> B?): BleDeserializer
             override fun deserialize(data: ByteArray): B? =
                     this@recoverableMapping.deserialize(data).let(f)
         }
+
+fun <A, B, C> BleDeserializer<A>.then(
+        deserializer: BleDeserializer<B>,
+        combiner: (A, B) -> C
+): BleDeserializer<C> =
+        object : BleDeserializer<C> {
+            override val length = this@then.length + deserializer.length
+            override fun deserialize(data: ByteArray): C? =
+                    this@then.deserialize(data.copyOfRange(0, this@then.length))
+                            ?.let { a ->
+                                deserializer.deserialize(data.copyOfRange(this@then.length, length))
+                                        ?.let { b -> combiner(a, b) }
+                            }
+        }
+
+fun <A, B> BleDeserializer<A>.then(deserializer: BleDeserializer<B>): BleDeserializer<Pair<A, B>> =
+        then(deserializer, ::Pair)

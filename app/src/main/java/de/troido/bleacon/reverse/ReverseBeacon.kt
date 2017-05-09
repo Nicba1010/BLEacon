@@ -37,12 +37,12 @@ class ReverseBeacon<out T>(
 ) : HandledBleActor(handler) {
 
     private val scanner = BeaconScanner(
+            deserializer,
             BleFilter {
                 uuid16 = this@ReverseBeacon.uuid16
                 uuid128 = this@ReverseBeacon.uuid128
             },
             scanSettings,
-            deserializer,
             handler
     ) { _, device, data -> onDeviceFound(this, device, data) }
 
