@@ -1,5 +1,7 @@
 package de.troido.bleacon.data
 
+// TODO actual parsing - return length of taken
+
 /**
  * BLE data deserializer.
  * Can be seen as a function from a [ByteArray] to some nullable [T], where `null` indicates a
@@ -7,8 +9,13 @@ package de.troido.bleacon.data
  *
  * @property[length] The size of the byte array this deserializer takes in.
  * Any function supplying data to [deserialize] **MUST** provide an array of this exact length.
+ * If [length] is equal to [BleDeserializer.ALL], the whole array will be consumed.
  */
 interface BleDeserializer<out T> {
+    companion object {
+        const val ALL: Int = -1
+    }
+
     val length: Int
 
     /**

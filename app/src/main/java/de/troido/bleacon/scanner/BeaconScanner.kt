@@ -19,7 +19,7 @@ typealias OnBeaconFound<T> = (BeaconScanner<T>, BluetoothDevice, T) -> Unit
 class BeaconScanner<out T>(
         private val deserializer: BleDeserializer<T>,
         filter: BleFilter,
-        settings: BleScanSettings = BleScanSettings {},
+        settings: BleScanSettings = BleScanSettings(),
         handler: Handler = Handler(),
         private val onDeviceFound: OnBeaconFound<T>
 ) : HandledBleActor(handler) {
@@ -35,7 +35,16 @@ class BeaconScanner<out T>(
                 scanRecord
                         ?.getManufacturerSpecificData(NORDIC_ID)
                         ?.let(filter.dataTransform)
-                        ?.takeIf { it.size >= deserializer.length }
+                        ?.takeIf {
+                            deserializer.length == BleDeserializer.ALL
+                                    || it.size >= deserializer.length
+                        }
+                        ?.let {
+                            when (deserializer.length) {
+                                BleDeserializer.ALL -> it
+                                else                -> it.copyOfRange(0, deserializer.length)
+                            }
+                        }
                         ?.let(deserializer::deserialize)
                         ?.let { onDeviceFound(this@BeaconScanner, device, it) }
             }

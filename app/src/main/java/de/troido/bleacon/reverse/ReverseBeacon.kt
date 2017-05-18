@@ -30,8 +30,8 @@ class ReverseBeacon<out T>(
         deserializer: BleDeserializer<T>,
         private val uuid16: Uuid16? = null,
         private val uuid128: UUID? = null,
-        scanSettings: BleScanSettings = BleScanSettings {},
-        adSettings: BleAdSettings = BleAdSettings {},
+        scanSettings: BleScanSettings = BleScanSettings(),
+        adSettings: BleAdSettings = BleAdSettings(),
         handler: Handler = Handler(),
         onDeviceFound: OnReverseBeaconFound<T>
 ) : HandledBleActor(handler) {

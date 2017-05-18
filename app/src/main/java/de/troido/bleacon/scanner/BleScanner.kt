@@ -31,7 +31,7 @@ class BleScanner(context: Context,
                  svcUuid: UUID,
                  chrUuid: UUID,
                  callback: BleScanCallback,
-                 settings: BleScanSettings = BleScanSettings {},
+                 settings: BleScanSettings = BleScanSettings(),
                  autoConnect: Boolean = false,
                  stopWhenFound: Boolean = true,
                  handler: Handler = Handler()
