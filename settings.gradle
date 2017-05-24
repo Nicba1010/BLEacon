@@ -1,1 +1,1 @@
-include ':app', ':bleaconlib'
+include ':library'
