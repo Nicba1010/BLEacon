@@ -14,7 +14,7 @@ object UnitDeserializer : BleDeserializer<Unit> {
  * Assumes [ByteOrder.LITTLE_ENDIAN] endianness.
  */
 object Float32Deserializer : BleDeserializer<Float> {
-    override val length = 8
+    override val length = 4
 
     override fun deserialize(data: ByteArray): Float? =
             ByteBuffer.wrap(data, 0, 4).order(ByteOrder.LITTLE_ENDIAN).float
