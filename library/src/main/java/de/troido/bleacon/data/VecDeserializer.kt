@@ -8,7 +8,7 @@ import de.troido.bleacon.util.sequence
  * @param[size] size of the vector.
  * @param[deserializer] deserializer for individual vector elements.
  */
-class VecDeserializer<out X : Primitive>(
+class VecDeserializer<out X : Any>(
         private val size: Int,
         private val deserializer: BleDeserializer<X>
 ) : BleDeserializer<List<X>> {
