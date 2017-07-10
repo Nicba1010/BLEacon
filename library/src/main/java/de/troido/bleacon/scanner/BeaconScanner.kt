@@ -16,7 +16,7 @@ typealias OnBeaconFound<T> = (BeaconScanner<T>, BluetoothDevice, T) -> Unit
 /**
  * @param[handler] optional handler for sharing with other asynchronous actions.
  */
-class BeaconScanner<out T>(
+class BeaconScanner<out T> @JvmOverloads constructor(
         private val deserializer: BleDeserializer<T>,
         filter: BleFilter,
         settings: BleScanSettings = BleScanSettings(),

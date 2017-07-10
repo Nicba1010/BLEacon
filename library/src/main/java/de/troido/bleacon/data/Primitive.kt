@@ -1,6 +1,5 @@
 package de.troido.bleacon.data
 
-import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 /**
@@ -17,31 +16,19 @@ sealed class Primitive {
     }
 
     data class Float32(val data: Float) : Primitive() {
-
         /**
          * [Float32] deserializer.
          * Assumes [ByteOrder.LITTLE_ENDIAN] endianness.
          */
-        object Deserializer : BleDeserializer<Float32> {
-            override val length = 4
-
-            override fun deserialize(data: ByteArray): Float32? =
-                    Float32(ByteBuffer.wrap(data, 0, 4).order(ByteOrder.LITTLE_ENDIAN).float)
-        }
+        object Deserializer : BleDeserializer<Float32> by Float32Deserializer.mapping(::Float32)
     }
 
     data class Float64(val data: Double) : Primitive() {
-
         /**
          * [Float64] deserializer.
          * Assumes [ByteOrder.LITTLE_ENDIAN] endianness.
          */
-        object Deserializer : BleDeserializer<Float64> {
-            override val length = 8
-
-            override fun deserialize(data: ByteArray): Float64? =
-                    Float64(ByteBuffer.wrap(data, 0, 8).order(ByteOrder.LITTLE_ENDIAN).double)
-        }
+        object Deserializer : BleDeserializer<Float64> by Float64Deserializer.mapping(::Float64)
     }
 
     data class Int8(val data: Byte) : Primitive() {
@@ -50,11 +37,7 @@ sealed class Primitive {
          * [Int8] deserializer.
          * Assumes [ByteOrder.LITTLE_ENDIAN] endianness.
          */
-        object Deserializer : BleDeserializer<Int8> {
-            override val length = 1
-
-            override fun deserialize(data: ByteArray): Int8? = Int8(data[0])
-        }
+        object Deserializer : BleDeserializer<Int8> by Int8Deserializer.mapping(::Int8)
     }
 
     data class Int16(val data: Short) : Primitive() {
@@ -63,12 +46,7 @@ sealed class Primitive {
          * [Int16] deserializer.
          * Assumes [ByteOrder.LITTLE_ENDIAN] endianness.
          */
-        object Deserializer : BleDeserializer<Int16> {
-            override val length = 2
-
-            override fun deserialize(data: ByteArray): Int16? =
-                    Int16(ByteBuffer.wrap(data, 0, 2).order(ByteOrder.LITTLE_ENDIAN).short)
-        }
+        object Deserializer : BleDeserializer<Int16> by Int16Deserializer.mapping(::Int16)
     }
 
     data class Int32(val data: Int) : Primitive() {
@@ -77,12 +55,7 @@ sealed class Primitive {
          * [Int32] deserializer.
          * Assumes [ByteOrder.LITTLE_ENDIAN] endianness.
          */
-        object Deserializer : BleDeserializer<Int32> {
-            override val length = 4
-
-            override fun deserialize(data: ByteArray): Int32? =
-                    Int32(ByteBuffer.wrap(data, 0, 4).order(ByteOrder.LITTLE_ENDIAN).int)
-        }
+        object Deserializer : BleDeserializer<Int32> by Int32Deserializer.mapping(::Int32)
     }
 
     data class Int64(val data: Long) : Primitive() {
@@ -91,11 +64,6 @@ sealed class Primitive {
          * [Int64] deserializer.
          * Assumes [ByteOrder.LITTLE_ENDIAN] endianness.
          */
-        object Deserializer : BleDeserializer<Int64> {
-            override val length = 8
-
-            override fun deserialize(data: ByteArray): Int64? =
-                    Int64(ByteBuffer.wrap(data, 0, 8).order(ByteOrder.LITTLE_ENDIAN).long)
-        }
+        object Deserializer : BleDeserializer<Int64> by Int64Deserializer.mapping(::Int64)
     }
 }
