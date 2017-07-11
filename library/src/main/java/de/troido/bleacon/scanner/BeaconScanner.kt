@@ -1,6 +1,5 @@
 package de.troido.bleacon.scanner
 
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.os.Handler
@@ -11,18 +10,24 @@ import de.troido.bleacon.config.BleFilter
 import de.troido.bleacon.config.BleScanSettings
 import de.troido.bleacon.data.BleDeserializer
 
-typealias OnBeaconFound<T> = (BeaconScanner<T>, BluetoothDevice, T) -> Unit
-
 /**
  * @param[handler] optional handler for sharing with other asynchronous actions.
  */
-class BeaconScanner<out T> @JvmOverloads constructor(
+class BeaconScanner<out T>(
         private val deserializer: BleDeserializer<T>,
         filter: BleFilter,
         settings: BleScanSettings = BleScanSettings(),
         handler: Handler = Handler(),
         private val onDeviceFound: OnBeaconFound<T>
 ) : HandledBleActor(handler) {
+
+    @JvmOverloads constructor(
+            deserializer: BleDeserializer<T>,
+            filter: BleFilter,
+            settings: BleScanSettings = BleScanSettings(),
+            handler: Handler = Handler(),
+            beaconListener: BeaconScannerListener<T>
+    ) : this(deserializer, filter, settings, handler, beaconListener::onBeaconFound)
 
     private val scanner = obtainScanner()
     private val filters = listOf(filter.filter)
@@ -46,7 +51,13 @@ class BeaconScanner<out T> @JvmOverloads constructor(
                             }
                         }
                         ?.let(deserializer::deserialize)
-                        ?.let { onDeviceFound(this@BeaconScanner, device, it) }
+                        ?.let {
+                            onDeviceFound(this@BeaconScanner,
+                                          BeaconMetaData(device,
+                                                         result.rssi,
+                                                         result.scanRecord.txPowerLevel),
+                                          it)
+                        }
             }
         }
     }
