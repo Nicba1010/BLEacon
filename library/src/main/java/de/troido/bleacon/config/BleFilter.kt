@@ -2,11 +2,11 @@ package de.troido.bleacon.config
 
 import android.bluetooth.le.ScanFilter
 import android.os.ParcelUuid
-import de.troido.bleacon.util.Building
 import de.troido.bleacon.ble.NORDIC_ID
+import de.troido.bleacon.util.Building
 import de.troido.bleacon.util.Uuid16
 import de.troido.bleacon.util.bytes
-import java.util.*
+import java.util.UUID
 
 private val EMPTY = ByteArray(0)
 
@@ -25,46 +25,39 @@ private val UUID128_TRANSFORM: (ByteArray) -> ByteArray =
  * This is useful for e.g. removing UUIDs before parsing at a higher level, so that the said
  * higher level can remain agnostic to UUID type in use, various headers, etc.
  */
-class BleFilter(internal val filter: ScanFilter,
-                internal val dataTransform: (ByteArray) -> ByteArray) {
+class BleFilter(
+        uuid16: Uuid16? = null,
+        uuid128: UUID? = null,
+        address: String? = null,
+        name: String? = null,
+        build: BleFilter.Builder.() -> Unit = {}
+) {
+    internal val filter: ScanFilter
+    internal val dataTransform: (ByteArray) -> ByteArray
 
-    constructor(builder: Builder) :
-            this(builder.filter.build(), builder.dataTransform)
-
-    constructor(build: Builder.() -> Unit) :
-            this(BleFilter.Builder().apply(build))
-
-    class Builder {
-        internal val filter = ScanFilter.Builder()
-
-        val manufacturerData = ManufacturerDataBuilder(filter)
-        val serviceData = ServiceDataBuilder(filter)
-
-        /** See [ScanFilter.Builder.setDeviceAddress]. */
-        var address: String? by Building(filter::setDeviceAddress)
-
-        /** See [ScanFilter.Builder.setDeviceName]. */
-        var name: String? by Building(filter::setDeviceName)
-
-        /**
-         * Adds the given UUID to manufacturer specific data.
-         * Overrides [uuid128] if set after setting [uuid128].
-         */
-        var uuid16: Uuid16? by Building {
-            manufacturerData[NORDIC_ID, UUID16_MASK] = it.bytes
-            dataTransform = UUID16_TRANSFORM
-            Unit
+    init {
+        val filterBuilder = ScanFilter.Builder().apply {
+            address?.let(this::setDeviceAddress)
+            name?.let(this::setDeviceName)
         }
-
-        /**
-         * Adds the given UUID to manufacturer specific data.
-         * Overrides [uuid16] if set after setting [uuid16].
-         */
-        var uuid128: UUID? by Building {
-            manufacturerData[NORDIC_ID, UUID128_MASK] = it.bytes
-            dataTransform = UUID128_TRANSFORM
-            Unit
+        val builder = BleFilter.Builder(filterBuilder).apply {
+            uuid16?.let {
+                manufacturerData[NORDIC_ID, UUID16_MASK] = it.bytes
+                dataTransform = UUID16_TRANSFORM
+            }
+            uuid128?.let {
+                manufacturerData[NORDIC_ID, UUID128_MASK] = it.bytes
+                dataTransform = UUID128_TRANSFORM
+            }
+            build(this)
         }
+        dataTransform = builder.dataTransform
+        filter = filterBuilder.build()
+    }
+
+    class Builder(filter: ScanFilter.Builder) {
+        val manufacturerData = BleFilter.ManufacturerDataBuilder(filter)
+        val serviceData = BleFilter.ServiceDataBuilder(filter)
 
         internal var dataTransform: (ByteArray) -> ByteArray = { it }
     }

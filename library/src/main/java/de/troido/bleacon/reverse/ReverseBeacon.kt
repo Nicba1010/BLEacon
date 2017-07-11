@@ -46,19 +46,19 @@ class ReverseBeacon<out T>(
 
     private val scanner = BeaconScanner(
             deserializer,
-            BleFilter {
-                uuid16 = this@ReverseBeacon.uuid16
+            BleFilter(
+                uuid16 = this@ReverseBeacon.uuid16,
                 uuid128 = this@ReverseBeacon.uuid128
-            },
+            ),
             scanSettings,
             handler
     ) { _, device, data -> onDeviceFound(this, device, data) }
 
     private val advertiser = BleAdvertiser(
-            BleAdData {
-                uuid16 = this@ReverseBeacon.uuid16
+            BleAdData(
+                uuid16 = this@ReverseBeacon.uuid16,
                 uuid128 = this@ReverseBeacon.uuid128
-            },
+            ),
             adSettings,
             handler
     )
