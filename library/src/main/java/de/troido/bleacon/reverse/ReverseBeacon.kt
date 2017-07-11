@@ -1,6 +1,5 @@
 package de.troido.bleacon.reverse
 
-import android.bluetooth.BluetoothDevice
 import android.os.Handler
 import de.troido.bleacon.advertiser.BleAdvertiser
 import de.troido.bleacon.ble.BleActor
@@ -12,9 +11,7 @@ import de.troido.bleacon.config.BleScanSettings
 import de.troido.bleacon.data.BleDeserializer
 import de.troido.bleacon.scanner.BeaconScanner
 import de.troido.bleacon.util.Uuid16
-import java.util.*
-
-typealias OnReverseBeaconFound<T> = (ReverseBeacon<T>, BluetoothDevice, T) -> Unit
+import java.util.UUID
 
 /**
  * A “reverse” beacon, in the sense that the device both advertises that it's looking for the
@@ -35,6 +32,17 @@ class ReverseBeacon<out T>(
         handler: Handler = Handler(),
         onDeviceFound: OnReverseBeaconFound<T>
 ) : HandledBleActor(handler) {
+
+    @JvmOverloads constructor(
+            deserializer: BleDeserializer<T>,
+            uuid16: Uuid16? = null,
+            uuid128: UUID? = null,
+            scanSettings: BleScanSettings = BleScanSettings(),
+            adSettings: BleAdSettings = BleAdSettings(),
+            handler: Handler = Handler(),
+            reverseBeaconListener: ReverseBeaconListener<T>
+    ) : this(deserializer, uuid16, uuid128, scanSettings, adSettings, handler,
+             reverseBeaconListener::onBeaconFound)
 
     private val scanner = BeaconScanner(
             deserializer,
