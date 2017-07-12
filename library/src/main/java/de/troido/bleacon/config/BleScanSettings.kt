@@ -6,7 +6,7 @@ import android.bluetooth.le.ScanSettings
 /**
  * DSL for [ScanSettings].
  */
-class BleScanSettings(
+class BleScanSettings @JvmOverloads constructor(
         scanMode: Int? = null,
         callbackType: Int? = null,
         matchMode: Int? = null,

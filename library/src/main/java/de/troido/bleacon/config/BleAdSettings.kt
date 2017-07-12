@@ -2,7 +2,7 @@ package de.troido.bleacon.config
 
 import android.bluetooth.le.AdvertiseSettings
 
-class BleAdSettings(
+class BleAdSettings @JvmOverloads constructor(
         advertiseMode: Int? = null,
         isConnectable: Boolean? = null,
         txPowerLevel: Int? = null,

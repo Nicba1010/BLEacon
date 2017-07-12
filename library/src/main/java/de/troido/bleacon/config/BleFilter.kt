@@ -25,7 +25,7 @@ private val UUID128_TRANSFORM: (ByteArray) -> ByteArray =
  * This is useful for e.g. removing UUIDs before parsing at a higher level, so that the said
  * higher level can remain agnostic to UUID type in use, various headers, etc.
  */
-class BleFilter(
+class BleFilter @JvmOverloads constructor(
         uuid16: Uuid16? = null,
         uuid128: UUID? = null,
         address: String? = null,
