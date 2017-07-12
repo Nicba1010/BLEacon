@@ -7,8 +7,10 @@ import android.os.Handler
 import de.troido.bleacon.ble.obtainAdvertiser
 import de.troido.bleacon.config.BleAdData
 import de.troido.bleacon.config.BleAdSettings
+import de.troido.bleacon.util.forEachPolled
 import de.troido.bleacon.util.postDelayed
 import de.troido.bleacon.util.sequence
+import java.util.LinkedList
 import java.util.PriorityQueue
 
 private const val ADV_TIME = 1 * 60 * 1000L
@@ -21,13 +23,15 @@ class QueuedBleAdvertiser(
     private val settings = settings.settings
     private val advertiser = obtainAdvertiser()
 
-    private val outgoing = mutableListOf<QueuedAdvertiseCallback>()
+    private val outgoing = LinkedList<QueuedAdvertiseCallback>()
     private val waiting = PriorityQueue(
             INITIAL_CAPACITY,
-            compareBy(QueuedBleAdvertiser.QueuedAdvertiseCallback::timeRemaining)
+            compareBy(QueuedAdvertiseCallback::timeRemaining)
                     .reversed()
-                    .thenBy(QueuedBleAdvertiser.QueuedAdvertiseCallback::lastAdTimestamp)
+                    .thenBy(QueuedAdvertiseCallback::lastAdTimestamp)
     )
+
+    private var scheduling = false
 
     operator fun plusAssign(data: BleAdData) = add(data)
 
@@ -38,20 +42,35 @@ class QueuedBleAdvertiser(
         }
 
         advertiser.startAdvertising(settings, it.data, it.data, it)
-        handler.postDelayed(ADV_TIME) { advertiser.stopAdvertising(it) }
+        handler.postDelayed(ADV_TIME) {
+            outgoing -= it
+            it.timeRemaining -= System.currentTimeMillis() - it.lastAdTimestamp
+            advertiser.stopAdvertising(it)
+        }
     }
 
     private fun organize() {
+        scheduling = true
+        handler.removeCallbacksAndMessages(null)
+
         val advTime = advertisingTime()
 
-        val all = PriorityQueue(waiting)
-        outgoing.forEach {
-            advertiser.stopAdvertising(it)
+        outgoing.forEachPolled {
             it.timeRemaining -= System.currentTimeMillis() - it.lastAdTimestamp
-            all.add(it)
+            advertiser.stopAdvertising(it)
+            if (it.timeRemaining > 0) {
+                waiting += it
+            }
         }
 
-        val (finishing, remaining) = waiting.sequence().partition { it.timeRemaining < advTime }
+        if (waiting.isEmpty()) {
+            scheduling = false
+            return
+        }
+
+        val (finishing, remaining) = waiting.sequence()
+                .filter { it.timeRemaining > 0 }
+                .partition { it.timeRemaining < advTime }
 
         (finishing + remaining).forEach {
             advertiser.startAdvertising(settings, it.data, it.data, it)
@@ -60,19 +79,12 @@ class QueuedBleAdvertiser(
         finishing.forEach {
             handler.postDelayed(it.timeRemaining) {
                 advertiser.stopAdvertising(it)
+                outgoing -= it
+                it.timeRemaining -= System.currentTimeMillis() - it.lastAdTimestamp
             }
         }
 
-        if (remaining.isNotEmpty()) {
-            handler.postDelayed(advTime) {
-                remaining.forEach {
-                    advertiser.stopAdvertising(it)
-                    it.timeRemaining -= advTime
-                    waiting.add(it)
-                }
-                organize()
-            }
-        }
+        handler.postDelayed(advTime, this::organize)
     }
 
     private fun advertisingTime(): Long =
@@ -86,13 +98,13 @@ class QueuedBleAdvertiser(
     ) : AdvertiseCallback() {
         override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
             lastAdTimestamp = System.currentTimeMillis()
-            outgoing.add(this)
+            outgoing += this
         }
 
         override fun onStartFailure(errorCode: Int) {
             if (errorCode == ADVERTISE_FAILED_TOO_MANY_ADVERTISERS) {
-                waiting.add(this)
-                if (outgoing.isEmpty() && waiting.size == 1) {
+                waiting += this
+                if (!scheduling) {
                     organize()
                 }
             }
