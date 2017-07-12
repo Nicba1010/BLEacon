@@ -1,10 +1,21 @@
 package de.troido.bleacon.advertiser
 
 import android.bluetooth.le.AdvertiseCallback
+import android.bluetooth.le.AdvertiseSettings
 import android.os.Handler
 import de.troido.bleacon.ble.HandledBleActor
+import de.troido.bleacon.ble.obtainAdvertiser
 import de.troido.bleacon.config.BleAdData
 import de.troido.bleacon.config.BleAdSettings
+import de.troido.bleacon.util.dLog
+
+private val defaultCallback = object : AdvertiseCallback() {
+    override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) =
+            dLog("advertising successfully started!")
+
+    override fun onStartFailure(errorCode: Int) =
+            dLog("advertising failed with error = $errorCode!")
+}
 
 /**
  * Idiomatic wrapper for [android.bluetooth.le.BluetoothLeAdvertiser].
@@ -17,12 +28,24 @@ class BleAdvertiser(
         private val data: BleAdData,
         settings: BleAdSettings = BleAdSettings(),
         handler: Handler = Handler(),
-        private val callback: AdvertiseCallback = DynamicBleAdvertiser.defaultCallback
+        private val callback: AdvertiseCallback = defaultCallback
 ) : HandledBleActor(handler) {
 
-    private val advertiser = DynamicBleAdvertiser(settings, handler, callback)
+    private val advertiser = obtainAdvertiser()
 
-    override fun start() = advertiser.start()
+    private val adSettings = settings.settings
 
-    override fun stop() = advertiser.stop()
+    override fun start() {
+        handler.post {
+            dLog("starting advertising...")
+            advertiser.startAdvertising(adSettings, data.data, data.data, callback)
+        }
+    }
+
+    override fun stop() {
+        handler.post {
+            dLog("stopping advertising...")
+            advertiser.stopAdvertising(callback)
+        }
+    }
 }
