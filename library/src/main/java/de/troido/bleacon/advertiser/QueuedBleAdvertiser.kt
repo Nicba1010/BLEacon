@@ -9,6 +9,7 @@ import de.troido.bleacon.config.BleAdData
 import de.troido.bleacon.config.BleAdSettings
 import de.troido.bleacon.util.forEachPolled
 import de.troido.bleacon.util.postDelayed
+import de.troido.bleacon.util.reverseOrder
 import de.troido.bleacon.util.sequence
 import java.util.LinkedList
 import java.util.PriorityQueue
@@ -27,7 +28,7 @@ class QueuedBleAdvertiser(
     private val waiting = PriorityQueue(
             INITIAL_CAPACITY,
             compareBy(QueuedAdvertiseCallback::timeRemaining)
-                    .reversed()
+                    .reverseOrder()
                     .thenBy(QueuedAdvertiseCallback::lastAdTimestamp)
     )
 
@@ -35,7 +36,8 @@ class QueuedBleAdvertiser(
 
     operator fun plusAssign(data: BleAdData) = add(data)
 
-    fun add(data: BleAdData): Unit = QueuedAdvertiseCallback(data.data, ADV_TIME, 0).let {
+    fun add(data: BleAdData): Unit = QueuedAdvertiseCallback(data.data, ADV_TIME,
+                                                             0).let {
         if (waiting.isNotEmpty()) {
             waiting.add(it)
             return
