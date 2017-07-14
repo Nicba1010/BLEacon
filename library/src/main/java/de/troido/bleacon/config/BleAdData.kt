@@ -12,7 +12,8 @@ private val HEADER = ByteArray(1) { -1 }
 /**
  * DSL for [AdvertiseData].
  */
-class BleAdData(
+class BleAdData
+@JvmOverloads constructor(
         uuid16: Uuid16? = null,
         uuid128: UUID? = null,
         includeTxPowerLevel: Boolean? = null,

@@ -24,7 +24,8 @@ private val defaultCallback = object : AdvertiseCallback() {
  *
  * @param[callback] optional custom callback. Default callback logs results to debug log.
  */
-class BleAdvertiser(
+class BleAdvertiser
+@JvmOverloads constructor(
         private val data: BleAdData,
         settings: BleAdSettings = BleAdSettings(),
         handler: Handler = Handler(),

@@ -17,7 +17,8 @@ import java.util.PriorityQueue
 private const val ADV_TIME = 1 * 60 * 1000L
 private const val INITIAL_CAPACITY = 8
 
-class QueuedBleAdvertiser(
+class QueuedBleAdvertiser
+@JvmOverloads constructor(
         settings: BleAdSettings = BleAdSettings()
 ) {
     private val handler = Handler()
