@@ -3,7 +3,6 @@ package de.troido.bleacon.config
 import android.bluetooth.le.ScanFilter
 import android.os.ParcelUuid
 import de.troido.bleacon.ble.NORDIC_ID
-import de.troido.bleacon.util.Building
 import de.troido.bleacon.util.Uuid16
 import de.troido.bleacon.util.bytes
 import java.util.UUID
@@ -114,23 +113,19 @@ class BleFilter @JvmOverloads constructor(
      */
     class ServiceDataBuilder(private val filter: ScanFilter.Builder) {
 
-        private var _uuid: ParcelUuid? = null
-        private var _mask: ParcelUuid? = null
+        var uuid: ParcelUuid? = null
+            set(value) {
+                if (value != null) {
+                    field = value
+                    setServiceUuid(value, mask)
+                }
+            }
 
-        /** See [ScanFilter.Builder.setServiceUuid]. */
-        var uuid: ParcelUuid? by Building {
-            _uuid = it
-            setServiceUuid(it, _mask)
-        }
-
-        /**
-         * See [ScanFilter.Builder.setServiceUuid].
-         * [uuid] must also be set for the mask to be applied.
-         */
-        var mask: ParcelUuid? by Building { mask ->
-            _mask = mask
-            _uuid?.let { uuid -> setServiceUuid(uuid, mask) }
-        }
+        var mask: ParcelUuid? = null
+            set(value) {
+                field = value
+                uuid?.let { setServiceUuid(it, value) }
+            }
 
         operator fun set(uuid: UUID, mask: ByteArray = EMPTY, data: ByteArray) =
                 set(ParcelUuid(uuid), mask, data)
@@ -140,6 +135,7 @@ class BleFilter @JvmOverloads constructor(
         }
 
         private fun setServiceUuid(uuid: ParcelUuid, mask: ParcelUuid?) =
-                filter.setServiceUuid(uuid, mask)
+                if (mask != null) filter.setServiceUuid(uuid, mask)
+                else filter.setServiceUuid(uuid)
     }
 }
