@@ -30,7 +30,7 @@ class BleAdData
         }
     }.build()
 
-    class Builder(internal val data: AdvertiseData.Builder = AdvertiseData.Builder()) {
+    class Builder(internal val data: AdvertiseData.Builder) {
         val manufacturerData = BleAdData.ManufacturerDataBuilder(data)
         val serviceData = BleAdData.ServiceDataBuilder(data)
     }
