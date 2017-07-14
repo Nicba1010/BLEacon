@@ -21,5 +21,6 @@ internal inline fun <A, B> Array<A>.foldM(initial: B, f: (B, A) -> B?): B? {
  * Returns a [List]`<`[T]`>` if no elements of `this` ([List]`<`[T?]`>`) are `null`, otherwise
  * returns `null`.
  */
+@Suppress("NOTHING_TO_INLINE")
 internal inline fun <T : Any> List<T?>.sequence(): List<T>? =
         if (any { it == null }) null else mapNotNull { it }
