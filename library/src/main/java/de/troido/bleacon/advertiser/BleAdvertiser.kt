@@ -28,6 +28,7 @@ class BleAdvertiser
 @JvmOverloads constructor(
         private val data: BleAdData,
         settings: BleAdSettings = BleAdSettings(),
+        private val dataMode: BleAdDataMode = BleAdDataMode.NO_SCAN_RESPONSE,
         handler: Handler = Handler(),
         private val callback: AdvertiseCallback = defaultCallback
 ) : HandledBleActor(handler) {
@@ -39,7 +40,14 @@ class BleAdvertiser
     override fun start() {
         handler.post {
             dLog("starting advertising...")
-            advertiser.startAdvertising(adSettings, data.data, data.data, callback)
+            when (dataMode) {
+                BleAdDataMode.SCAN_RESPONSE       ->
+                    advertiser.startAdvertising(adSettings, data.data, data.data, callback)
+                BleAdDataMode.EMPTY_SCAN_RESPONSE ->
+                    advertiser.startAdvertising(adSettings, data.data, BleAdData().data, callback)
+                BleAdDataMode.NO_SCAN_RESPONSE    ->
+                    advertiser.startAdvertising(adSettings, data.data, callback)
+            }
         }
     }
 

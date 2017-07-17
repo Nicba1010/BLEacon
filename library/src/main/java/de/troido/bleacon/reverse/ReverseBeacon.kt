@@ -60,7 +60,7 @@ class ReverseBeacon<out T>(
                 uuid128 = this@ReverseBeacon.uuid128
             ),
             adSettings,
-            handler
+            handler = handler
     )
 
     private val actors = arrayOf(scanner, advertiser)
