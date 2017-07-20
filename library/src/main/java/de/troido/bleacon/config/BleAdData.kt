@@ -17,7 +17,7 @@ class BleAdData
         uuid16: Uuid16? = null,
         uuid128: UUID? = null,
         includeTxPowerLevel: Boolean? = null,
-        includeDeviceName: Boolean? = null,
+        includeDeviceName: Boolean? = false,
         build: BleAdData.Builder.() -> Unit = {}
 ) {
     internal val data = AdvertiseData.Builder().apply {
