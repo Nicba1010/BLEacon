@@ -1,12 +1,13 @@
 package de.troido.bleacon.advertiser
 
 import android.bluetooth.le.AdvertiseCallback
+import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.os.Handler
 import de.troido.bleacon.ble.HandledBleActor
 import de.troido.bleacon.ble.obtainAdvertiser
-import de.troido.bleacon.config.BleAdData
-import de.troido.bleacon.config.BleAdSettings
+import de.troido.bleacon.config.advertise.adSettings
+import de.troido.bleacon.config.advertise.bleAdData
 import de.troido.bleacon.util.dLog
 
 private val defaultCallback = object : AdvertiseCallback() {
@@ -26,8 +27,8 @@ private val defaultCallback = object : AdvertiseCallback() {
  */
 class BleAdvertiser
 @JvmOverloads constructor(
-        private val data: BleAdData,
-        settings: BleAdSettings = BleAdSettings(),
+        private val data: AdvertiseData,
+        private val settings: AdvertiseSettings = adSettings(),
         private val dataMode: BleAdDataMode = BleAdDataMode.NO_SCAN_RESPONSE,
         handler: Handler = Handler(),
         private val callback: AdvertiseCallback = defaultCallback
@@ -35,18 +36,16 @@ class BleAdvertiser
 
     private val advertiser = obtainAdvertiser()
 
-    private val adSettings = settings.settings
-
     override fun start() {
         handler.post {
             dLog("starting advertising...")
             when (dataMode) {
                 BleAdDataMode.SCAN_RESPONSE       ->
-                    advertiser.startAdvertising(adSettings, data.data, data.data, callback)
+                    advertiser.startAdvertising(settings, data, data, callback)
                 BleAdDataMode.EMPTY_SCAN_RESPONSE ->
-                    advertiser.startAdvertising(adSettings, data.data, BleAdData().data, callback)
+                    advertiser.startAdvertising(settings, data, bleAdData(), callback)
                 BleAdDataMode.NO_SCAN_RESPONSE    ->
-                    advertiser.startAdvertising(adSettings, data.data, callback)
+                    advertiser.startAdvertising(settings, data, callback)
             }
         }
     }

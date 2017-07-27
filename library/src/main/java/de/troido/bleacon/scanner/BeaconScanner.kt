@@ -1,13 +1,14 @@
 package de.troido.bleacon.scanner
 
 import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.os.Handler
 import de.troido.bleacon.ble.HandledBleActor
 import de.troido.bleacon.ble.NORDIC_ID
 import de.troido.bleacon.ble.obtainScanner
-import de.troido.bleacon.config.BleFilter
-import de.troido.bleacon.config.BleScanSettings
+import de.troido.bleacon.config.scan.scanSettings
 import de.troido.bleacon.data.BleDeserializer
 
 /**
@@ -15,23 +16,24 @@ import de.troido.bleacon.data.BleDeserializer
  */
 class BeaconScanner<out T>(
         private val deserializer: BleDeserializer<T>,
-        filter: BleFilter,
-        settings: BleScanSettings = BleScanSettings(),
+        filter: ScanFilter,
+        dataTransform: (ByteArray) -> ByteArray = { it },
+        private val settings: ScanSettings = scanSettings(),
         handler: Handler = Handler(),
         private val onDeviceFound: OnBeaconFound<T>
 ) : HandledBleActor(handler) {
 
     @JvmOverloads constructor(
             deserializer: BleDeserializer<T>,
-            filter: BleFilter,
-            settings: BleScanSettings = BleScanSettings(),
+            filter: ScanFilter,
+            dataTransform: (ByteArray) -> ByteArray = { it },
+            settings: ScanSettings = scanSettings(),
             handler: Handler = Handler(),
             beaconListener: BeaconScannerListener<T>
-    ) : this(deserializer, filter, settings, handler, beaconListener::onBeaconFound)
+    ) : this(deserializer, filter, dataTransform, settings, handler, beaconListener::onBeaconFound)
 
     private val scanner = obtainScanner()
-    private val filters = listOf(filter.filter)
-    private val scanSettings = settings.settings
+    private val filters = listOf(filter)
 
     private val callback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
@@ -39,7 +41,7 @@ class BeaconScanner<out T>(
             result?.run {
                 scanRecord
                         ?.getManufacturerSpecificData(NORDIC_ID)
-                        ?.let(filter.dataTransform)
+                        ?.let(dataTransform)
                         ?.takeIf {
                             deserializer.length == BleDeserializer.ALL
                                     || it.size >= deserializer.length
@@ -64,7 +66,7 @@ class BeaconScanner<out T>(
 
     override fun start() {
         handler.post {
-            scanner.startScan(filters, scanSettings, callback)
+            scanner.startScan(filters, settings, callback)
         }
     }
 

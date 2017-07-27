@@ -2,12 +2,14 @@ package de.troido.bleacon.scanner
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.Handler
 import de.troido.bleacon.ble.HandledBleActor
 import de.troido.bleacon.ble.obtainScanner
-import de.troido.bleacon.config.BleFilter
+import de.troido.bleacon.config.scan.scanSettings
 import java.util.UUID
 
 /**
@@ -26,11 +28,11 @@ import java.util.UUID
  * @param[handler] optional handler for sharing with other asynchronous actions.
  */
 class BleScanner(context: Context,
-                 filter: BleFilter,
+                 filter: ScanFilter,
                  svcUuid: UUID,
                  chrUuid: UUID,
                  callback: BleScanCallback,
-                 settings: BleScanSettings = BleScanSettings(),
+                 private val settings: ScanSettings = scanSettings(),
                  autoConnect: Boolean = false,
                  stopWhenFound: Boolean = true,
                  handler: Handler = Handler()
@@ -38,8 +40,7 @@ class BleScanner(context: Context,
 
     private val scanner = obtainScanner()
 
-    private val filters = listOf(filter.filter)
-    private val scanSettings = settings.settings
+    private val filters = listOf(filter)
 
     private val gattCallback = callback.toBtGattCallback(svcUuid, chrUuid, this)
 
@@ -64,7 +65,7 @@ class BleScanner(context: Context,
     }
 
     override fun start() {
-        handler.post { scanner.startScan(filters, scanSettings, scanCallback) }
+        handler.post { scanner.startScan(filters, settings, scanCallback) }
     }
 
     override fun stop() {
