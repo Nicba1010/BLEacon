@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothProfile
-import java.util.*
+import java.util.UUID
 
 interface BleScanCallback {
     fun onConnect(): Unit = Unit
