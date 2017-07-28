@@ -1,6 +1,6 @@
 package de.troido.bleacon.util
 
-import java.util.*
+import java.util.UUID
 
 private const val BASE_UUID = "-0000-1000-8000-00805F9B34FB"
 

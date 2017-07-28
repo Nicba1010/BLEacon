@@ -6,7 +6,7 @@ group = 'com.github.toxxmeister'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "25.0.3"
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 25

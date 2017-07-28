@@ -5,8 +5,7 @@ import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.os.Handler
 import de.troido.bleacon.ble.obtainAdvertiser
-import de.troido.bleacon.config.BleAdData
-import de.troido.bleacon.config.BleAdSettings
+import de.troido.bleacon.config.advertise.adSettings
 import de.troido.bleacon.util.forEachPolled
 import de.troido.bleacon.util.postDelayed
 import de.troido.bleacon.util.reverseOrder
@@ -19,10 +18,9 @@ private const val INITIAL_CAPACITY = 8
 
 class QueuedBleAdvertiser
 @JvmOverloads constructor(
-        settings: BleAdSettings = BleAdSettings()
+        private val settings: AdvertiseSettings = adSettings()
 ) {
     private val handler = Handler()
-    private val settings = settings.settings
     private val advertiser = obtainAdvertiser()
 
     private val outgoing = LinkedList<QueuedAdvertiseCallback>()
@@ -35,22 +33,22 @@ class QueuedBleAdvertiser
 
     private var scheduling = false
 
-    operator fun plusAssign(data: BleAdData) = add(data)
+    operator fun plusAssign(data: AdvertiseData) = add(data)
 
-    fun add(data: BleAdData): Unit = QueuedAdvertiseCallback(data.data, ADV_TIME,
-                                                             0).let {
-        if (waiting.isNotEmpty()) {
-            waiting.add(it)
-            return
-        }
+    fun add(data: AdvertiseData): Unit =
+            QueuedAdvertiseCallback(data, ADV_TIME, 0).let {
+                if (waiting.isNotEmpty()) {
+                    waiting.add(it)
+                    return
+                }
 
-        advertiser.startAdvertising(settings, it.data, it.data, it)
-        handler.postDelayed(ADV_TIME) {
-            outgoing -= it
-            it.timeRemaining -= System.currentTimeMillis() - it.lastAdTimestamp
-            advertiser.stopAdvertising(it)
-        }
-    }
+                advertiser.startAdvertising(settings, it.data, it.data, it)
+                handler.postDelayed(ADV_TIME) {
+                    outgoing -= it
+                    it.timeRemaining -= System.currentTimeMillis() - it.lastAdTimestamp
+                    advertiser.stopAdvertising(it)
+                }
+            }
 
     private fun organize() {
         scheduling = true

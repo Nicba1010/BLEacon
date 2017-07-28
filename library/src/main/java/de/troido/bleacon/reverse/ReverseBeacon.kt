@@ -1,13 +1,18 @@
 package de.troido.bleacon.reverse
 
+import android.bluetooth.le.AdvertiseSettings
+import android.bluetooth.le.ScanSettings
 import android.os.Handler
 import de.troido.bleacon.advertiser.BleAdvertiser
 import de.troido.bleacon.ble.BleActor
 import de.troido.bleacon.ble.HandledBleActor
-import de.troido.bleacon.config.BleAdData
-import de.troido.bleacon.config.BleAdSettings
-import de.troido.bleacon.config.BleFilter
-import de.troido.bleacon.config.BleScanSettings
+import de.troido.bleacon.config.advertise.adSettings
+import de.troido.bleacon.config.advertise.bleAdData
+import de.troido.bleacon.config.scan.IDENTITY
+import de.troido.bleacon.config.scan.UUID128_TRANSFORM
+import de.troido.bleacon.config.scan.UUID16_TRANSFORM
+import de.troido.bleacon.config.scan.bleFilter
+import de.troido.bleacon.config.scan.scanSettings
 import de.troido.bleacon.data.BleDeserializer
 import de.troido.bleacon.scanner.BeaconScanner
 import de.troido.bleacon.util.Uuid16
@@ -27,8 +32,8 @@ class ReverseBeacon<out T>(
         deserializer: BleDeserializer<T>,
         private val uuid16: Uuid16? = null,
         private val uuid128: UUID? = null,
-        scanSettings: BleScanSettings = BleScanSettings(),
-        adSettings: BleAdSettings = BleAdSettings(),
+        scanSettings: ScanSettings = scanSettings(),
+        adSettings: AdvertiseSettings = adSettings(),
         handler: Handler = Handler(),
         onDeviceFound: OnReverseBeaconFound<T>
 ) : HandledBleActor(handler) {
@@ -37,8 +42,8 @@ class ReverseBeacon<out T>(
             deserializer: BleDeserializer<T>,
             uuid16: Uuid16? = null,
             uuid128: UUID? = null,
-            scanSettings: BleScanSettings = BleScanSettings(),
-            adSettings: BleAdSettings = BleAdSettings(),
+            scanSettings: ScanSettings = scanSettings(),
+            adSettings: AdvertiseSettings = adSettings(),
             handler: Handler = Handler(),
             reverseBeaconListener: ReverseBeaconListener<T>
     ) : this(deserializer, uuid16, uuid128, scanSettings, adSettings, handler,
@@ -46,18 +51,21 @@ class ReverseBeacon<out T>(
 
     private val scanner = BeaconScanner(
             deserializer,
-            BleFilter(
-                uuid16 = this@ReverseBeacon.uuid16,
-                uuid128 = this@ReverseBeacon.uuid128
+            bleFilter(
+                    uuid16 = this@ReverseBeacon.uuid16,
+                    uuid128 = this@ReverseBeacon.uuid128
             ),
+            if (uuid16 != null) UUID16_TRANSFORM
+            else if (uuid128 != null) UUID128_TRANSFORM
+            else IDENTITY,
             scanSettings,
             handler
     ) { _, device, data -> onDeviceFound(this, device, data) }
 
     private val advertiser = BleAdvertiser(
-            BleAdData(
-                uuid16 = this@ReverseBeacon.uuid16,
-                uuid128 = this@ReverseBeacon.uuid128
+            bleAdData(
+                    uuid16 = this@ReverseBeacon.uuid16,
+                    uuid128 = this@ReverseBeacon.uuid128
             ),
             adSettings,
             handler = handler
