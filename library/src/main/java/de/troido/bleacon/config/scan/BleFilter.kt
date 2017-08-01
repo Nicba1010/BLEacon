@@ -9,8 +9,6 @@ import de.troido.bleacon.util.bytes
 import java.util.UUID
 import kotlin.experimental.or
 
-// TODO data transforms?
-
 private val UUID16_MASK = ByteArray(2) { -1 }
 private val UUID128_MASK = ByteArray(16) { -1 }
 
