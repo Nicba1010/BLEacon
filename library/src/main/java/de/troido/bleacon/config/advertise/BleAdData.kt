@@ -12,17 +12,19 @@ fun bleAdData(uuid16: Uuid16? = null,
               uuid128: UUID? = null,
               includeTxPowerLevel: Boolean = false,
               includeDeviceName: Boolean = false,
-              build: AdDataBuilder.() -> Unit = {}) =
+              build: AdDataBuilder.() -> Unit = {}): AdvertiseData =
 
-        AdvertiseData.Builder().apply {
-            setIncludeTxPowerLevel(includeTxPowerLevel)
-            setIncludeDeviceName(includeDeviceName)
+        AdvertiseData.Builder()
+                .apply {
+                    setIncludeTxPowerLevel(includeTxPowerLevel)
+                    setIncludeDeviceName(includeDeviceName)
 
-            AdDataBuilder(this).apply {
-                uuid16?.let { msd[NORDIC_ID] = it.bytes }
-                uuid128?.let { msd[NORDIC_ID] = it.bytes }
-            }.apply(build)
-        }.build()
+                    AdDataBuilder(this).apply {
+                        uuid16?.let { msd[NORDIC_ID] = it.bytes }
+                        uuid128?.let { msd[NORDIC_ID] = it.bytes }
+                    }.apply(build)
+                }
+                .build()
 
 class AdDataBuilder(dataBuilder: AdvertiseData.Builder) {
     val msd = MsdBuilder(dataBuilder)
