@@ -6,6 +6,8 @@ import android.util.Log
 import de.troido.bleacon.util.toHex
 import kotlin.concurrent.thread
 
+private const val TRIES = 1000
+
 class AutoCloseBleChrWriter(
         private val chr: BluetoothGattCharacteristic,
         private val gatt: BluetoothGatt
@@ -15,11 +17,13 @@ class AutoCloseBleChrWriter(
         Log.d("WRITING", "WRITING ${value.toHex()}")
 
         chr.value = value
-        while (!gatt.writeCharacteristic(chr)) Unit
-
-        Log.d("WRITTEN", "WRITTEN ${value.toHex()}")
+        for (i in 0..TRIES) {
+            if (gatt.writeCharacteristic(chr)) {
+                Log.d("WRITTEN", "WRITTEN ${value.toHex()}")
+                break
+            }
+        }
 
         gatt.close()
-        gatt.disconnect()
     }
 }
