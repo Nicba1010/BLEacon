@@ -51,7 +51,7 @@ fun bleConnectionCallback(svcUuid: UUID,
         gatt?.getService(svcUuid)
                 ?.getCharacteristic(chrUuid)
                 ?.let { chr ->
-                    chr.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+                    chr.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
                     onBeaconnoWriter(BleChrWriter(chr, gatt))
                 }
     }
