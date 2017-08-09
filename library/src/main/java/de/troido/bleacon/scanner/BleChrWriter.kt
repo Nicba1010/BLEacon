@@ -24,12 +24,11 @@ class BleChrWriter(
 
                 chr.value = it
                 while (!gatt.writeCharacteristic(chr)) Unit
+                done = true
 
                 Log.d("WRITTEN", "WRITTEN ${it.toHex()}")
-                done = true
             }
         }
-        gatt.disconnect()
     }
 
     fun write(value: ByteArray) {

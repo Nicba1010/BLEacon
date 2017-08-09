@@ -11,7 +11,6 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.Handler
-import android.util.Log
 import de.troido.bleacon.ble.HandledBleActor
 import de.troido.bleacon.ble.NORDIC_ID
 import de.troido.bleacon.ble.obtainScanner
@@ -37,8 +36,6 @@ fun bleConnectionCallback(svcUuid: UUID,
                                          newState: Int) {
         super.onConnectionStateChange(gatt, status, newState)
 
-        Log.d("DumbDebug", newState.toString())
-
         when (newState) {
             BluetoothProfile.STATE_CONNECTED    -> gatt?.discoverServices()
             BluetoothProfile.STATE_DISCONNECTED -> gatt?.close()
@@ -51,7 +48,7 @@ fun bleConnectionCallback(svcUuid: UUID,
         gatt?.getService(svcUuid)
                 ?.getCharacteristic(chrUuid)
                 ?.let { chr ->
-                    chr.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                    chr.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
                     onBeaconnoWriter(BleChrWriter(chr, gatt))
                 }
     }
