@@ -15,9 +15,10 @@ class BleChrWriter(
         private val gatt: BluetoothGatt
 ) {
     private val queue = ConcurrentLinkedQueue<ByteArray>()
+    private var done = false
 
     private val worker = thread {
-        while (true) {
+        while (!done) {
             queue.poll()?.let {
                 Log.d("WRITING", "WRITING ${it.toHex()}")
 
@@ -25,8 +26,10 @@ class BleChrWriter(
                 while (!gatt.writeCharacteristic(chr)) Unit
 
                 Log.d("WRITTEN", "WRITTEN ${it.toHex()}")
+                done = true
             }
         }
+        gatt.disconnect()
     }
 
     fun write(value: ByteArray) {
