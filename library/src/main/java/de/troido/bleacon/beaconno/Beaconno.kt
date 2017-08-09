@@ -11,6 +11,7 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.Handler
+import android.util.Log
 import de.troido.bleacon.ble.HandledBleActor
 import de.troido.bleacon.ble.NORDIC_ID
 import de.troido.bleacon.ble.obtainScanner
@@ -35,6 +36,8 @@ fun bleConnectionCallback(svcUuid: UUID,
                                          status: Int,
                                          newState: Int) {
         super.onConnectionStateChange(gatt, status, newState)
+
+        Log.d("DumbDebug", newState.toString())
 
         when (newState) {
             BluetoothProfile.STATE_CONNECTED    -> gatt?.discoverServices()
