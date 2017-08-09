@@ -17,13 +17,13 @@ import de.troido.bleacon.ble.obtainScanner
 import de.troido.bleacon.config.scan.scanSettings
 import de.troido.bleacon.data.BleDeserializer
 import de.troido.bleacon.data.NullDeserializer
+import de.troido.bleacon.scanner.AutoCloseBleChrWriter
 import de.troido.bleacon.scanner.BeaconMetaData
-import de.troido.bleacon.scanner.BleChrWriter
 import java.util.UUID
 
 typealias OnBeaconno<T> = (scanner: BeaconnoScanner<T>, device: BeaconnoDevice<T>) -> Unit
 typealias OnBeaconnoData<T> = (data: T) -> Unit
-typealias OnBeaconnoWriter = (writer: BleChrWriter) -> Unit
+typealias OnBeaconnoWriter = (writer: AutoCloseBleChrWriter) -> Unit
 
 
 fun bleConnectionCallback(svcUuid: UUID,
@@ -49,7 +49,7 @@ fun bleConnectionCallback(svcUuid: UUID,
                 ?.getCharacteristic(chrUuid)
                 ?.let { chr ->
                     chr.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
-                    onBeaconnoWriter(BleChrWriter(chr, gatt))
+                    onBeaconnoWriter(AutoCloseBleChrWriter(chr, gatt))
                 }
     }
 }
