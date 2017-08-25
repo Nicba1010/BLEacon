@@ -15,7 +15,7 @@ import de.troido.bleacon.config.scan.bleFilter
 import de.troido.bleacon.config.scan.scanSettings
 import de.troido.bleacon.data.BleDeserializer
 import de.troido.bleacon.scanner.BeaconScanner
-import de.troido.bleacon.util.Uuid16
+import de.troido.ekstend.uuid.Uuid16
 import java.util.UUID
 
 /**
@@ -55,9 +55,11 @@ class ReverseBeacon<out T>(
                     uuid16 = this@ReverseBeacon.uuid16,
                     uuid128 = this@ReverseBeacon.uuid128
             ),
-            if (uuid16 != null) UUID16_TRANSFORM
-            else if (uuid128 != null) UUID128_TRANSFORM
-            else IDENTITY,
+            when {
+                uuid16 != null  -> UUID16_TRANSFORM
+                uuid128 != null -> UUID128_TRANSFORM
+                else            -> IDENTITY
+            },
             scanSettings,
             handler
     ) { _, device, data -> onDeviceFound(this, device, data) }

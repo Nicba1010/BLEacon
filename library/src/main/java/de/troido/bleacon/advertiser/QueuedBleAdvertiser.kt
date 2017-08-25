@@ -6,10 +6,10 @@ import android.bluetooth.le.AdvertiseSettings
 import android.os.Handler
 import de.troido.bleacon.ble.obtainAdvertiser
 import de.troido.bleacon.config.advertise.adSettings
-import de.troido.bleacon.util.forEachPolled
-import de.troido.bleacon.util.postDelayed
-import de.troido.bleacon.util.reverseOrder
-import de.troido.bleacon.util.sequence
+import de.troido.ekstend.android.threads.postDelayed
+import de.troido.ekstend.collections.forEachPolled
+import de.troido.ekstend.collections.reverseOrder
+import de.troido.ekstend.collections.sequence
 import java.util.LinkedList
 import java.util.PriorityQueue
 

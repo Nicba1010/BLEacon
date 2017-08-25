@@ -8,14 +8,14 @@ import de.troido.bleacon.ble.HandledBleActor
 import de.troido.bleacon.ble.obtainAdvertiser
 import de.troido.bleacon.config.advertise.adSettings
 import de.troido.bleacon.config.advertise.bleAdData
-import de.troido.bleacon.util.dLog
+import de.troido.ekstend.android.debug.logD
 
 private val defaultCallback = object : AdvertiseCallback() {
     override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) =
-            dLog("advertising successfully started!")
+            logD("advertising successfully started!")
 
     override fun onStartFailure(errorCode: Int) =
-            dLog("advertising failed with error = $errorCode!")
+            logD("advertising failed with error = $errorCode!")
 }
 
 /**
@@ -38,7 +38,7 @@ class BleAdvertiser
 
     override fun start() {
         handler.post {
-            dLog("starting advertising...")
+            logD("starting advertising...")
             when (dataMode) {
                 BleAdDataMode.SCAN_RESPONSE       ->
                     advertiser.startAdvertising(settings, data, data, callback)
@@ -52,7 +52,7 @@ class BleAdvertiser
 
     override fun stop() {
         handler.post {
-            dLog("stopping advertising...")
+            logD("stopping advertising...")
             advertiser.stopAdvertising(callback)
         }
     }

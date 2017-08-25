@@ -6,8 +6,8 @@ typealias OnReverseBeaconFound<T> = (scanner: ReverseBeacon<T>,
                                      metaData: BeaconMetaData,
                                      data: T) -> Unit
 
-interface ReverseBeaconListener<T> {
+interface ReverseBeaconListener<in T> {
     fun onBeaconFound(scanner: ReverseBeacon<T>,
                       metaData: BeaconMetaData,
-                      data: T): Unit
+                      data: T)
 }

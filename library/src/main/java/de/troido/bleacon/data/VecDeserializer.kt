@@ -1,6 +1,6 @@
 package de.troido.bleacon.data
 
-import de.troido.bleacon.util.sequence
+import de.troido.ekstend.functional.sequence
 
 /**
  * Fixed size list deserializer.

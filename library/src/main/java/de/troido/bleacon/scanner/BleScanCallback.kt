@@ -7,9 +7,9 @@ import android.bluetooth.BluetoothProfile
 import java.util.UUID
 
 interface BleScanCallback {
-    fun onConnect(): Unit = Unit
-    fun onDisconnect(scanner: BleScanner): Unit = Unit
-    fun onWriterReady(writer: BleChrWriter): Unit = Unit
+    fun onConnect() = Unit
+    fun onDisconnect(scanner: BleScanner) = Unit
+    fun onWriterReady(writer: BleChrWriter) = Unit
 }
 
 /**

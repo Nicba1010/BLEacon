@@ -1,7 +1,7 @@
 package de.troido.bleacon.ble
 
 import android.os.Handler
-import de.troido.bleacon.util.postDelayed
+import de.troido.ekstend.android.threads.postDelayed
 
 /**
  * [BleActor] with [BleActor.start]`(Long)` and [BleActor.pause] implemented through a [Handler].

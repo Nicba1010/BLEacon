@@ -3,7 +3,7 @@ package de.troido.bleacon.scanner
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.util.Log
-import de.troido.bleacon.util.toHex
+import de.troido.ekstend.serial.toHex
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.concurrent.thread
 

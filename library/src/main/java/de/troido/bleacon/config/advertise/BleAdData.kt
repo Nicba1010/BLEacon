@@ -3,8 +3,8 @@ package de.troido.bleacon.config.advertise
 import android.bluetooth.le.AdvertiseData
 import android.os.ParcelUuid
 import de.troido.bleacon.ble.NORDIC_ID
-import de.troido.bleacon.util.Uuid16
-import de.troido.bleacon.util.bytes
+import de.troido.ekstend.uuid.Uuid16
+import de.troido.ekstend.uuid.bytes
 import java.util.UUID
 
 @JvmOverloads

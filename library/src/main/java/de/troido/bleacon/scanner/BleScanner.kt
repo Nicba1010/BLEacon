@@ -36,7 +36,7 @@ class BleScanner(context: Context,
                  autoConnect: Boolean = false,
                  stopWhenFound: Boolean = true,
                  handler: Handler = Handler()
-) : HandledBleActor() {
+) : HandledBleActor(handler) {
 
     private val scanner = obtainScanner()
 

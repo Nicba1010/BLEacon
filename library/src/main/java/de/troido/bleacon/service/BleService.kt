@@ -8,7 +8,7 @@ import android.os.Binder
 import android.os.IBinder
 import android.os.SystemClock
 import de.troido.bleacon.ble.BleActor
-import de.troido.bleacon.util.alarmService
+import de.troido.ekstend.android.system.alarmManager
 
 private const val RESTART_DELAY: Long = 100
 
@@ -18,7 +18,7 @@ private const val RESTART_DELAY: Long = 100
  * @param[autoStart] if `true` automatically starts BLE actors on service start
  * @param[restartOnRemove] if `true` automatically restarts the activity on task removal
  */
-abstract class BleService<out T>(
+abstract class BleService(
         private val autoStart: Boolean = true,
         private val restartOnRemove: Boolean = true
 ) : Service() {
@@ -27,7 +27,7 @@ abstract class BleService<out T>(
      * Service binder for [BleService].
      * Its [BleActor] methods directly control all of the [actors] at once.
      */
-    inner class BleBinder() : Binder(), BleActor {
+    inner class BleBinder : Binder(), BleActor {
         override fun start() = actors.forEach(BleActor::start)
         override fun stop() = actors.forEach(BleActor::stop)
         override fun start(millis: Long) = actors.forEach { it.start(millis) }
@@ -57,7 +57,7 @@ abstract class BleService<out T>(
 
         actors.forEach(BleActor::stop)
         if (restartOnRemove) {
-            applicationContext.alarmService.set(
+            applicationContext.alarmManager.set(
                     AlarmManager.ELAPSED_REALTIME,
                     SystemClock.elapsedRealtime() + RESTART_DELAY,
                     PendingIntent.getService(

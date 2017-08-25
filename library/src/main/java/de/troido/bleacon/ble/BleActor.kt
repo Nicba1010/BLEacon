@@ -6,14 +6,14 @@ package de.troido.bleacon.ble
 interface BleActor {
 
     /** Run the actor indefinitely. */
-    fun start(): Unit
+    fun start()
 
     /** Stop the actor. */
-    fun stop(): Unit
+    fun stop()
 
     /** Run the actor for [millis] milliseconds. */
-    fun start(millis: Long): Unit
+    fun start(millis: Long)
 
     /** Pause the actor for [millis] milliseconds. */
-    fun pause(millis: Long): Unit
+    fun pause(millis: Long)
 }
