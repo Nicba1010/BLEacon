@@ -10,6 +10,7 @@ import de.troido.bleacon.ble.NORDIC_ID
 import de.troido.bleacon.ble.obtainScanner
 import de.troido.bleacon.config.scan.scanSettings
 import de.troido.bleacon.data.BleDeserializer
+import de.troido.bleacon.data.matchesLength
 
 /**
  * @param[handler] optional handler for sharing with other asynchronous actions.
@@ -42,10 +43,7 @@ class BeaconScanner<out T>(
                 scanRecord
                         ?.getManufacturerSpecificData(NORDIC_ID)
                         ?.let(dataTransform)
-                        ?.takeIf {
-                            deserializer.length == BleDeserializer.ALL
-                                    || it.size >= deserializer.length
-                        }
+                        ?.takeIf { deserializer.matchesLength(it) }
                         ?.let {
                             when (deserializer.length) {
                                 BleDeserializer.ALL -> it
