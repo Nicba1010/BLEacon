@@ -18,28 +18,33 @@ import de.troido.bleacon.config.scan.scanSettings
 import de.troido.bleacon.data.BleDeserializer
 import de.troido.bleacon.data.NullDeserializer
 import de.troido.bleacon.scanner.BeaconMetaData
+import de.troido.bleacon.scanner.BleChrWriter
 import de.troido.bleacon.scanner.OneTimeBleChrWriter
 import java.util.UUID
 
 typealias OnBeaconno<T> = (scanner: BeaconnoScanner<T>, device: BeaconnoDevice<T>) -> Unit
 typealias OnBeaconnoData<T> = (data: T) -> Unit
-typealias OnBeaconnoWriter = (writer: OneTimeBleChrWriter) -> Unit
+typealias OnBeaconnoWriter = (writer: BleChrWriter) -> Unit
 
 interface OnBeaconnoConnection {
     fun onConnect() {}
     fun onDisconnect() {}
-    fun onBeaconnoWriter(writer: OneTimeBleChrWriter) {}
+    fun onBeaconnoWriter(writer: BleChrWriter) {}
 }
 
-fun bleConnectionCallback(svcUuid: UUID,
-                          chrUuid: UUID,
-                          listener: OnBeaconnoConnection
-): BluetoothGattCallback =
-        bleConnectionCallback(svcUuid, chrUuid, listener::onConnect, listener::onDisconnect,
-                              listener::onBeaconnoWriter)
+typealias BleChrWriterCtor = (BluetoothGattCharacteristic, BluetoothGatt) -> BleChrWriter
 
 fun bleConnectionCallback(svcUuid: UUID,
                           chrUuid: UUID,
+                          writerCtor: BleChrWriterCtor = ::OneTimeBleChrWriter,
+                          listener: OnBeaconnoConnection
+): BluetoothGattCallback =
+        bleConnectionCallback(svcUuid, chrUuid, writerCtor, listener::onConnect,
+                              listener::onDisconnect, listener::onBeaconnoWriter)
+
+fun bleConnectionCallback(svcUuid: UUID,
+                          chrUuid: UUID,
+                          writerCtor: BleChrWriterCtor = ::OneTimeBleChrWriter,
                           onConnect: () -> Unit = {},
                           onDisconnect: () -> Unit = {},
                           onBeaconnoWriter: OnBeaconnoWriter = {}
@@ -69,7 +74,7 @@ fun bleConnectionCallback(svcUuid: UUID,
                 ?.getCharacteristic(chrUuid)
                 ?.let { chr ->
                     chr.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
-                    onBeaconnoWriter(OneTimeBleChrWriter(chr, gatt))
+                    onBeaconnoWriter(writerCtor(chr, gatt))
                 }
     }
 }

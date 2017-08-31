@@ -58,7 +58,7 @@ internal fun BleScanCallback.toBtGattCallback(
                         ?.getCharacteristic(chrUuid)
                         ?.let { chr ->
                             chr.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
-                            onWriterReady(BleChrWriter(chr, gatt))
+                            onWriterReady(QueuedBleChrWriter(chr, gatt))
                         }
             }
         }
