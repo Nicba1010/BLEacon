@@ -25,10 +25,24 @@ typealias OnBeaconno<T> = (scanner: BeaconnoScanner<T>, device: BeaconnoDevice<T
 typealias OnBeaconnoData<T> = (data: T) -> Unit
 typealias OnBeaconnoWriter = (writer: OneTimeBleChrWriter) -> Unit
 
+interface OnBeaconnoConnection {
+    fun onConnect() {}
+    fun onDisconnect() {}
+    fun onBeaconnoWriter(writer: OneTimeBleChrWriter) {}
+}
 
 fun bleConnectionCallback(svcUuid: UUID,
                           chrUuid: UUID,
-                          onBeaconnoWriter: OnBeaconnoWriter
+                          listener: OnBeaconnoConnection
+): BluetoothGattCallback =
+        bleConnectionCallback(svcUuid, chrUuid, listener::onConnect, listener::onDisconnect,
+                              listener::onBeaconnoWriter)
+
+fun bleConnectionCallback(svcUuid: UUID,
+                          chrUuid: UUID,
+                          onConnect: () -> Unit = {},
+                          onDisconnect: () -> Unit = {},
+                          onBeaconnoWriter: OnBeaconnoWriter = {}
 ): BluetoothGattCallback = object : BluetoothGattCallback() {
 
     override fun onConnectionStateChange(gatt: BluetoothGatt?,
@@ -37,8 +51,14 @@ fun bleConnectionCallback(svcUuid: UUID,
         super.onConnectionStateChange(gatt, status, newState)
 
         when (newState) {
-            BluetoothProfile.STATE_CONNECTED    -> gatt?.discoverServices()
-            BluetoothProfile.STATE_DISCONNECTED -> gatt?.close()
+            BluetoothProfile.STATE_CONNECTED    -> {
+                gatt?.discoverServices()
+                onConnect()
+            }
+            BluetoothProfile.STATE_DISCONNECTED -> {
+                gatt?.close()
+                onDisconnect()
+            }
         }
     }
 
