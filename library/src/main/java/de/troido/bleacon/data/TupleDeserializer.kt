@@ -1,6 +1,7 @@
 package de.troido.bleacon.data
 
 import de.troido.ekstend.functional.Tuple4
+import de.troido.ekstend.functional.Tuple5
 import de.troido.ekstend.functional.flat
 
 class PairDeserializer<out A : Any, out B : Any>(
@@ -34,12 +35,26 @@ class Tuple4Deserializer<out A : Any, out B : Any, out C : Any, out D : Any>(
         private val deserializerD: BleDeserializer<D>
 ) : BleDeserializer<Tuple4<A, B, C, D>> {
 
-    private val deserializers = listOf(deserializerA, deserializerB, deserializerC, deserializerD)
-
     override val length: Int = deserializerA.length + deserializerB.length +
             deserializerC.length + deserializerD.length
 
     override fun deserialize(data: ByteArray): Tuple4<A, B, C, D>? =
             deserializerA.then(deserializerB).then(deserializerC).then(deserializerD)
                     .deserialize(data)?.flat()
+}
+
+class Tuple5Deserializer<out A : Any, out B : Any, out C : Any, out D : Any, out E: Any>(
+        private val deserializerA: BleDeserializer<A>,
+        private val deserializerB: BleDeserializer<B>,
+        private val deserializerC: BleDeserializer<C>,
+        private val deserializerD: BleDeserializer<D>,
+        private val deserializerE: BleDeserializer<E>
+) : BleDeserializer<Tuple5<A, B, C, D, E>> {
+
+    override val length: Int = deserializerA.length + deserializerB.length +
+            deserializerC.length + deserializerD.length + deserializerE.length
+
+    override fun deserialize(data: ByteArray): Tuple5<A, B, C, D, E>? =
+            deserializerA.then(deserializerB).then(deserializerC).then(deserializerD)
+                    .then(deserializerE).deserialize(data)?.flat()
 }
