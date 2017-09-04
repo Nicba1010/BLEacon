@@ -1,13 +1,10 @@
 package de.troido.bleacon.config.scan
 
 import android.bluetooth.le.ScanFilter
-import android.os.ParcelUuid
 import de.troido.bleacon.ble.NORDIC_ID
-import de.troido.ekstend.collections.EMPTY
 import de.troido.ekstend.uuid.Uuid16
 import de.troido.ekstend.uuid.bytes
 import java.util.UUID
-import kotlin.experimental.or
 
 private val UUID16_MASK = ByteArray(2) { -1 }
 private val UUID128_MASK = ByteArray(16) { -1 }
@@ -35,44 +32,3 @@ fun bleFilter(uuid16: Uuid16? = null,
                 serviceData.uuid?.let { uuid -> setServiceUuid(uuid, serviceData.mask) }
             }.apply(build)
         }.build()
-
-
-class BleFilterBuilder(filterBuilder: ScanFilter.Builder) {
-    val msd = MsdBuilder()
-    val serviceData = ServiceDataBuilder(filterBuilder)
-
-    class MsdBuilder {
-        private val builderData = mutableMapOf<Int, MutableList<MsdPart>>()
-
-        internal val data: List<Msd>
-            get() = builderData.map { (id, parts) -> combineMsdParts(id, parts) }
-
-        operator fun set(id: Int, mask: ByteArray = EMPTY, data: ByteArray) =
-                builderData.getOrPut(id, ::mutableListOf).add(
-                        MsdPart(mask, data))
-    }
-
-    class ServiceDataBuilder(private val filterBuilder: ScanFilter.Builder) {
-        var uuid: ParcelUuid? = null
-        var mask: ParcelUuid? = null
-
-        operator fun set(uuid: ParcelUuid, mask: ByteArray = EMPTY, data: ByteArray) {
-            filterBuilder.setServiceData(uuid, data, mask)
-        }
-    }
-}
-
-
-private fun combineMsdParts(id: Int, parts: List<MsdPart>): Msd {
-    val size = parts.map { it.mask.size }.max()
-            ?: return Msd(id, byteArrayOf(), byteArrayOf())
-    val msdMask = ByteArray(size)
-    val msdData = ByteArray(size)
-
-    for ((mask, data) in parts) {
-        for (i in 0..mask.lastIndex) msdMask[i] = msdMask[i] or mask[i]
-        for (i in 0..data.lastIndex) msdData[i] = msdData[i] or data[i]
-    }
-
-    return Msd(id, msdMask, msdData)
-}
