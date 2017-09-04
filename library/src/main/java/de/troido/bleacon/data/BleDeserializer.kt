@@ -28,11 +28,6 @@ interface BleDeserializer<out T> {
 fun <T> BleDeserializer<T>.matchesLength(data: ByteArray): Boolean =
         length == BleDeserializer.ALL || data.size >= length
 
-class NullDeserializer<T> : BleDeserializer<T> {
-    override val length: Int = 0
-    override fun deserialize(data: ByteArray): T? = null
-}
-
 /**
  * Returns a deserializer which maps the output of `this` deserializer through the given
  * function [f].
