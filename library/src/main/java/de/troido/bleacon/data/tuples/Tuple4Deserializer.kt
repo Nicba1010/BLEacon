@@ -2,10 +2,10 @@ package de.troido.bleacon.data.tuples
 
 import de.troido.bleacon.data.BleDeserializer
 import de.troido.bleacon.data.then
-import de.troido.ekstend.functional.Tuple4
-import de.troido.ekstend.functional.flat
+import de.troido.ekstend.functional.tuples.Tuple4
+import de.troido.ekstend.functional.tuples.flat
 
-class Tuple4Deserializer<out A : Any, out B : Any, out C : Any, out D : Any>(
+class Tuple4Deserializer<out A, out B, out C, out D>(
         private val deserializerA: BleDeserializer<A>,
         private val deserializerB: BleDeserializer<B>,
         private val deserializerC: BleDeserializer<C>,
