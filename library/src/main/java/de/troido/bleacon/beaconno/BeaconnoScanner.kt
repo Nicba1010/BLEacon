@@ -10,7 +10,7 @@ import de.troido.bleacon.ble.HandledBleActor
 import de.troido.bleacon.ble.obtainScanner
 import de.troido.bleacon.config.scan.scanSettings
 import de.troido.bleacon.data.BleDeserializer
-import de.troido.bleacon.data.NullDeserializer
+import de.troido.bleacon.data.UndefinedDeserializer
 import de.troido.bleacon.scanner.BeaconMetaData
 
 /**
@@ -38,7 +38,7 @@ import de.troido.bleacon.scanner.BeaconMetaData
  */
 class BeaconnoScanner<T>(context: Context,
                          filter: ScanFilter,
-                         deserializer: BleDeserializer<T> = NullDeserializer(),
+                         deserializer: BleDeserializer<T> = UndefinedDeserializer(),
                          dataTransform: (ByteArray) -> ByteArray,
                          private val settings: ScanSettings = scanSettings(),
                          handler: Handler = Handler(),
