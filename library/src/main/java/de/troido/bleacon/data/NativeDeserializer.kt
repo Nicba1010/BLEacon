@@ -3,12 +3,6 @@ package de.troido.bleacon.data
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-object UnitDeserializer : BleDeserializer<Unit> {
-    override val length = 0
-
-    override fun deserialize(data: ByteArray): Unit? = Unit
-}
-
 /**
  * [Float] deserializer.
  * Assumes [ByteOrder.LITTLE_ENDIAN] endianness.
