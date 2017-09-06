@@ -5,7 +5,7 @@ import de.troido.bleacon.data.then
 import de.troido.ekstend.functional.tuples.Tuple4
 import de.troido.ekstend.functional.tuples.flat
 
-class Tuple4Deserializer<out A, out B, out C, out D>(
+class Tuple4Deserializer<out A : Any, out B : Any, out C : Any, out D : Any>(
         private val deserializerA: BleDeserializer<A>,
         private val deserializerB: BleDeserializer<B>,
         private val deserializerC: BleDeserializer<C>,
