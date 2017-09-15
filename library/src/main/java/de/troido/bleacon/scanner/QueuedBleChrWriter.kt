@@ -13,7 +13,7 @@ import kotlin.concurrent.thread
 class QueuedBleChrWriter(
         private val chr: BluetoothGattCharacteristic,
         private val gatt: BluetoothGatt
-): BleChrWriter {
+) : BleChrWriter {
     private val queue = ConcurrentLinkedQueue<ByteArray>()
 
     private val worker = thread {
@@ -33,5 +33,11 @@ class QueuedBleChrWriter(
         queue.offer(value)
     }
 
-    override fun close() = gatt.close()
+    override fun close() {
+        thread {
+            while (true) {
+                if (queue.isEmpty()) gatt.close()
+            }
+        }
+    }
 }
