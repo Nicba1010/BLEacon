@@ -36,7 +36,10 @@ class QueuedBleChrWriter(
     override fun close() {
         thread {
             while (true) {
-                if (queue.isEmpty()) gatt.close()
+                if (queue.isEmpty()) {
+                    gatt.close()
+                    break
+                }
             }
         }
     }
