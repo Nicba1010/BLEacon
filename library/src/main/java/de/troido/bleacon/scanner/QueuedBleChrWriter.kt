@@ -12,29 +12,34 @@ class QueuedBleChrWriter(
         private val chr: BluetoothGattCharacteristic,
         private val gatt: BluetoothGatt
 ) : BleChrWriter {
-    private val queue = ConcurrentLinkedQueue<ByteArray>()
+    private val queue = ConcurrentLinkedQueue<WriterAction>()
 
     private val worker = thread {
         while (true) {
             queue.poll()?.let {
-                chr.value = it
-                while (!gatt.writeCharacteristic(chr)) Unit
+                when (it) {
+                    is Write -> {
+                        chr.value = it.value
+                        while (!gatt.writeCharacteristic(chr)) Unit
+                    }
+                    is Close -> gatt.close()
+                }
             }
         }
     }
 
     override fun write(value: ByteArray) {
-        queue.offer(value)
+        queue.offer(Write(value))
     }
 
     override fun close() {
-        thread {
-            while (true) {
-                if (queue.isEmpty()) {
-                    gatt.close()
-                    break
-                }
-            }
-        }
+        queue.offer(Close)
     }
 }
+
+private sealed class WriterAction
+
+@Suppress("ArrayInDataClass")
+private data class Write(val value: ByteArray) : WriterAction()
+
+private object Close : WriterAction()
