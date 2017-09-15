@@ -2,8 +2,6 @@ package de.troido.bleacon.scanner
 
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
-import android.util.Log
-import de.troido.ekstend.serial.toHex
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.concurrent.thread
 
@@ -19,12 +17,8 @@ class QueuedBleChrWriter(
     private val worker = thread {
         while (true) {
             queue.poll()?.let {
-                Log.d("WRITING", "WRITING ${it.toHex()}")
-
                 chr.value = it
                 while (!gatt.writeCharacteristic(chr)) Unit
-
-                Log.d("WRITTEN", "WRITTEN ${it.toHex()}")
             }
         }
     }
