@@ -32,4 +32,6 @@ class QueuedBleChrWriter(
     override fun write(value: ByteArray) {
         queue.offer(value)
     }
+
+    override fun close() = gatt.close()
 }

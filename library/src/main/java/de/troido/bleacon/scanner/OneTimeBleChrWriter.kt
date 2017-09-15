@@ -9,7 +9,7 @@ import kotlin.concurrent.thread
 class OneTimeBleChrWriter(
         private val chr: BluetoothGattCharacteristic,
         private val gatt: BluetoothGatt
-): BleChrWriter {
+) : BleChrWriter {
 
     override fun write(value: ByteArray) {
         thread {
@@ -21,4 +21,6 @@ class OneTimeBleChrWriter(
             Log.d("WRITTEN", "WRITTEN ${value.toHex()}")
         }
     }
+
+    override fun close() = gatt.close()
 }
