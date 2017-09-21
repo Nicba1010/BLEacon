@@ -48,8 +48,8 @@ fun bleConnectionCallback(svcUuid: UUID,
                 onConnect()
             }
             BluetoothProfile.STATE_DISCONNECTED -> {
-                gatt?.close()
                 onDisconnect(gatt)
+                gatt?.close()
             }
         }
     }
