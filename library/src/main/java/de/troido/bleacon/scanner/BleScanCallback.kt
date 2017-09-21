@@ -4,8 +4,7 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothProfile
-import android.util.Log
-import java.util.UUID
+import java.util.*
 
 interface BleScanCallback {
     fun onConnect() = Unit
@@ -41,7 +40,7 @@ internal fun BleScanCallback.toBtGattCallback(
                 super.onConnectionStateChange(gatt, status, newState)
 
                 when (newState) {
-                    BluetoothProfile.STATE_CONNECTED    -> {
+                    BluetoothProfile.STATE_CONNECTED -> {
                         gatt?.discoverServices()
                         onConnect()
                     }
@@ -54,18 +53,11 @@ internal fun BleScanCallback.toBtGattCallback(
 
             override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
                 super.onServicesDiscovered(gatt, status)
-                if (status == BluetoothGatt.GATT_SUCCESS) {
-                    try {
-                        Thread.sleep(500)
-                        gatt?.getService(svcUuid)
-                                ?.getCharacteristic(chrUuid)
-                                ?.let { chr ->
-                                    chr.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
-                                    onWriterReady(QueuedBleChrWriter(chr, gatt))
-                                }
-                    } catch (e: InterruptedException) {
-                        Log.e("GATT", "Error", e)
-                    }
-                }
+                gatt?.getService(svcUuid)
+                        ?.getCharacteristic(chrUuid)
+                        ?.let { chr ->
+                            chr.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+                            onWriterReady(QueuedBleChrWriter(chr, gatt))
+                        }
             }
         }
