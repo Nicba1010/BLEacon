@@ -11,10 +11,11 @@ import java.util.UUID
 typealias OnBeaconno<T> = (scanner: BeaconnoScanner<T>, device: BeaconnoDevice<T>) -> Unit
 typealias OnBeaconnoData<T> = (data: T) -> Unit
 typealias OnBeaconnoWriter = (writer: BleChrWriter) -> Unit
+typealias OnDisconnect= (gatt: BluetoothGatt?) -> Unit
 
 interface OnBeaconnoConnection {
     fun onConnect() {}
-    fun onDisconnect() {}
+    fun onDisconnect(gatt: BluetoothGatt?) {}
     fun onBeaconnoWriter(writer: BleChrWriter) {}
 }
 
@@ -32,7 +33,7 @@ fun bleConnectionCallback(svcUuid: UUID,
                           chrUuid: UUID,
                           writerCtor: BleChrWriterCtor = ::OneTimeBleChrWriter,
                           onConnect: () -> Unit = {},
-                          onDisconnect: () -> Unit = {},
+                          onDisconnect: OnDisconnect = {},
                           onBeaconnoWriter: OnBeaconnoWriter = {}
 ): BluetoothGattCallback = object : BluetoothGattCallback() {
 
@@ -48,7 +49,7 @@ fun bleConnectionCallback(svcUuid: UUID,
             }
             BluetoothProfile.STATE_DISCONNECTED -> {
                 gatt?.close()
-                onDisconnect()
+                onDisconnect(gatt)
             }
         }
     }
